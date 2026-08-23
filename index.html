@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Maquinaria</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#2a4a5e">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<style>
+  :root{
+    --bg:#f2f1ea; --panel:#ffffff; --ink:#2a2a24; --muted:#6b6b60;
+    --accent:#2a4a5e; --accent2:#3d6a86;
+    --amarillo:#c98a12; --verde:#46562a; --rojo:#7a2a12;
+    --borde:#dedad0;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;}
+  body{padding-bottom:40px;}
+  header{background:var(--accent);color:#fff;padding:14px 16px;
+    display:flex;align-items:center;justify-content:space-between;
+    position:sticky;top:0;z-index:10;}
+  header h1{font-size:18px;margin:0;font-weight:700;}
+  header .quien{font-size:13px;opacity:.9;display:flex;align-items:center;gap:8px;}
+  header .quien button{background:transparent;border:1px solid rgba(255,255,255,.5);
+    color:#fff;border-radius:8px;padding:4px 8px;font-size:12px;}
+  main{max-width:520px;margin:0 auto;padding:16px;}
+  .oculto{display:none !important;}
+
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .tarjeta{background:var(--panel);border:1px solid var(--borde);border-radius:16px;
+    padding:20px 12px;text-align:center;font-size:16px;font-weight:700;
+    display:flex;flex-direction:column;align-items:center;gap:8px;
+    box-shadow:0 1px 3px rgba(0,0,0,.06);}
+  .tarjeta .ico{font-size:32px;}
+  .tarjeta small{font-weight:400;color:var(--muted);font-size:12px;}
+
+  .btn{display:block;width:100%;padding:16px;border:none;border-radius:14px;
+    font-size:17px;font-weight:700;color:#fff;background:var(--accent);
+    margin-bottom:12px;}
+  .btn.grande{padding:26px;font-size:20px;}
+  .btn.secundario{background:var(--accent2);}
+  .btn.verde{background:var(--verde);}
+  .btn.rojo{background:var(--rojo);}
+  .btn.amarillo{background:var(--amarillo);}
+  .btn.chico{padding:10px;font-size:14px;margin-bottom:0;}
+  .btn.fantasma{background:transparent;color:var(--accent);border:1px solid var(--accent);}
+  .btn:active{opacity:.8;}
+
+  .volver{background:none;border:none;color:var(--accent);font-size:15px;
+    font-weight:700;padding:8px 0 16px;display:flex;align-items:center;gap:4px;}
+
+  .campo{margin-bottom:16px;}
+  .campo label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px;
+    font-weight:600;}
+  .campo input[type=text], .campo input[type=number], .campo textarea, .campo select{
+    width:100%;padding:14px;border:1px solid var(--borde);border-radius:10px;
+    font-size:16px;background:#fff;}
+  .campo textarea{min-height:80px;resize:vertical;}
+  .campo input[type=number]{font-size:24px;font-weight:700;text-align:center;}
+
+  .chips{display:flex;flex-wrap:wrap;gap:8px;}
+  .chip{padding:12px 14px;border:1px solid var(--borde);border-radius:999px;
+    background:#fff;font-size:14px;font-weight:600;}
+  .chip.sel{background:var(--accent);color:#fff;border-color:var(--accent);}
+
+  .maquinas{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;}
+  .maquinas .chip{border-radius:10px;text-align:center;padding:14px 6px;}
+
+  .lista{margin-top:16px;}
+  .item{background:var(--panel);border:1px solid var(--borde);border-radius:12px;
+    padding:12px 14px;margin-bottom:8px;}
+  .item .fila1{display:flex;justify-content:space-between;font-size:13px;
+    color:var(--muted);margin-bottom:4px;}
+  .item .titulo{font-weight:700;font-size:15px;}
+  .item .desc{font-size:14px;color:#444;margin-top:4px;}
+  .item img{max-width:100%;border-radius:8px;margin-top:8px;display:block;}
+
+  .tarea{background:var(--panel);border:1px solid var(--borde);border-radius:12px;
+    padding:12px 14px;margin-bottom:8px;display:flex;gap:12px;align-items:flex-start;}
+  .tarea.hecha{opacity:.55;}
+  .tarea .check{width:26px;height:26px;border-radius:50%;border:2px solid var(--verde);
+    flex:0 0 auto;margin-top:2px;background:#fff;}
+  .tarea.hecha .check{background:var(--verde);}
+  .tarea .cont{flex:1;}
+  .tarea .txt{font-size:15px;font-weight:600;}
+  .tarea.hecha .txt{text-decoration:line-through;}
+  .tarea .meta{font-size:12px;color:var(--muted);margin-top:2px;}
+  .tarea img{max-width:100%;border-radius:8px;margin-top:8px;}
+
+  .seccion-tit{font-size:14px;font-weight:700;color:var(--muted);
+    text-transform:uppercase;letter-spacing:.03em;margin:20px 0 8px;}
+
+  .preview{width:100%;border-radius:12px;margin-bottom:12px;display:none;}
+  input[type=file]{display:none;}
+  .btn-foto{background:#fff;border:2px dashed var(--borde);color:var(--muted);
+    border-radius:14px;padding:24px;text-align:center;font-weight:700;margin-bottom:16px;}
+
+  .toast{position:fixed;left:16px;right:16px;bottom:20px;max-width:520px;margin:0 auto;
+    background:var(--ink);color:#fff;padding:14px 18px;border-radius:12px;
+    font-size:14px;text-align:center;z-index:50;box-shadow:0 4px 16px rgba(0,0,0,.2);}
+
+  .selectorNombre .chip{width:100%;text-align:center;padding:18px;font-size:17px;}
+  .selectorNombre .chips{flex-direction:column;}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🔧 Maquinaria</h1>
+  <div class="quien oculto" id="hdrQuien">
+    <span id="hdrNombre"></span>
+    <button onclick="cambiarNombre()">cambiar</button>
+  </div>
+</header>
+
+<main>
+
+  <!-- ===================== SELECTOR DE NOMBRE ===================== -->
+  <section id="vSelector" class="selectorNombre">
+    <p style="font-weight:700;font-size:17px;margin-top:8px;">¿Quién sos?</p>
+    <div class="chips" id="chipsPersonas"></div>
+  </section>
+
+  <!-- ===================== HOME ===================== -->
+  <section id="vHome" class="oculto">
+    <div class="grid2">
+      <div class="tarjeta" onclick="ir('combustible')">
+        <div class="ico">⛽</div>Combustible<small>cargar o llegada al galpón</small>
+      </div>
+      <div class="tarjeta" onclick="ir('labores')">
+        <div class="ico">🔩</div>Labores<small>reparación, service, mejora</small>
+      </div>
+      <div class="tarjeta" onclick="ir('remitos')">
+        <div class="ico">🧾</div>Remitos<small>sacale foto y subilo</small>
+      </div>
+      <div class="tarjeta" onclick="ir('tareas')">
+        <div class="ico">✅</div>Tareas<small id="contTareas">a hacer</small>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== COMBUSTIBLE ===================== -->
+  <section id="vCombustible" class="oculto">
+    <button class="volver" onclick="ir('home')">‹ Volver</button>
+
+    <div id="combPaso1">
+      <button class="btn grande verde" onclick="combElegirTipo('Carga a máquina')">⛽ Cargar a una máquina</button>
+      <button class="btn grande secundario" onclick="combElegirTipo('Llegada al galpón')">🛢️ Llegó combustible al galpón</button>
+
+      <div class="seccion-tit">Últimas cargas</div>
+      <div class="lista" id="listaCombustible"></div>
+    </div>
+
+    <div id="combPaso2" class="oculto">
+      <button class="volver" onclick="volverCombPaso1()">‹ Volver</button>
+      <p style="font-weight:700;font-size:16px;" id="combTituloTipo"></p>
+
+      <div class="campo oculto" id="combCampoMaquina">
+        <label>Máquina</label>
+        <div class="maquinas" id="chipsMaquinasComb"></div>
+      </div>
+
+      <div class="campo">
+        <label>Litros</label>
+        <input type="number" id="combLitros" inputmode="decimal" placeholder="0">
+      </div>
+
+      <button class="btn grande" onclick="guardarCombustibleUI()">Guardar</button>
+    </div>
+  </section>
+
+  <!-- ===================== LABORES ===================== -->
+  <section id="vLabores" class="oculto">
+    <button class="volver" onclick="ir('home')">‹ Volver</button>
+
+    <div class="campo">
+      <label>Máquina / equipo</label>
+      <div class="maquinas" id="chipsMaquinasLab"></div>
+    </div>
+
+    <div class="campo">
+      <label>Tipo</label>
+      <div class="chips" id="chipsTipoLabor"></div>
+    </div>
+
+    <div class="campo">
+      <label>¿Qué se hizo / qué hay que hacer?</label>
+      <textarea id="labDescripcion" placeholder="Descripción..."></textarea>
+    </div>
+
+    <button class="btn grande" onclick="guardarLaborUI()">Guardar</button>
+
+    <div class="seccion-tit">Últimas labores</div>
+    <div class="lista" id="listaLabores"></div>
+  </section>
+
+  <!-- ===================== REMITOS ===================== -->
+  <section id="vRemitos" class="oculto">
+    <button class="volver" onclick="ir('home')">‹ Volver</button>
+
+    <label class="btn-foto" id="remBtnFoto">
+      📷 Tocá para sacar o elegir la foto del remito
+      <input type="file" id="remInput" accept="image/*" capture="environment" onchange="remFotoElegida(event)">
+    </label>
+    <img id="remPreview" class="preview">
+
+    <div class="campo">
+      <label>Descripción (opcional)</label>
+      <textarea id="remDescripcion" placeholder="Qué se compró..."></textarea>
+    </div>
+
+    <button class="btn grande" onclick="guardarRemitoUI()">Subir remito</button>
+
+    <div class="seccion-tit">Últimos remitos</div>
+    <div class="lista" id="listaRemitos"></div>
+  </section>
+
+  <!-- ===================== TAREAS ===================== -->
+  <section id="vTareas" class="oculto">
+    <button class="volver" onclick="ir('home')">‹ Volver</button>
+
+    <button class="btn grande verde" onclick="abrirNuevaTarea()">+ Nueva tarea</button>
+
+    <div id="formNuevaTarea" class="oculto">
+      <div class="campo">
+        <label>¿Qué hay que hacer?</label>
+        <textarea id="tarTexto" placeholder="Descripción de la tarea..."></textarea>
+      </div>
+      <label class="btn-foto" id="tarBtnFoto">
+        📷 Agregar foto (opcional)
+        <input type="file" id="tarInput" accept="image/*" capture="environment" onchange="tarFotoElegida(event)">
+      </label>
+      <img id="tarPreview" class="preview">
+      <button class="btn" onclick="guardarTareaUI()">Crear tarea</button>
+      <button class="btn fantasma" onclick="cerrarNuevaTarea()">Cancelar</button>
+    </div>
+
+    <div class="seccion-tit">Pendientes</div>
+    <div class="lista" id="listaTareasPend"></div>
+
+    <div class="seccion-tit">Hechas</div>
+    <div class="lista" id="listaTareasHechas"></div>
+  </section>
+
+</main>
+
+<div id="toast" class="toast oculto"></div>
+
+<script>
+/* ====================== CONFIGURACIÓN ====================== */
+var BACKEND = 'https://script.google.com/macros/s/AKfycbxVQIf6LaUN0HNzIuTumP5FjF16CHCjLVoaWZA0hQMFHJRjZDGduCWindkiRfDfn3Y9EA/exec';
+
+var PERSONAS = ['Gutiérrez', 'Druetta', 'Gallo', 'Altuna L.', 'Roberto', 'Lucio', 'Daniel'];
+var TIPOS_LABOR = ['Reparación', 'Mantenimiento', 'Mejora', 'Cambio de piezas'];
+
+/* ====================== ESTADO ====================== */
+var estado = {
+  nombre: localStorage.getItem('maq_nombre') || '',
+  maquinas: [],
+  combTipo: '',
+  combMaquina: '',
+  remFotoDataUrl: '',
+  tarFotoDataUrl: ''
+};
+
+/* ====================== ARRANQUE ====================== */
+document.addEventListener('DOMContentLoaded', function () {
+  renderChipsPersonas();
+  if (estado.nombre) {
+    mostrarHeaderNombre();
+    ir('home');
+    cargarMaquinas();
+  } else {
+    ir('selector');
+  }
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').catch(function () {});
+  }
+});
+
+function renderChipsPersonas() {
+  var cont = document.getElementById('chipsPersonas');
+  cont.innerHTML = '';
+  PERSONAS.forEach(function (p) {
+    var b = document.createElement('button');
+    b.className = 'chip';
+    b.textContent = p;
+    b.onclick = function () { elegirNombre(p); };
+    cont.appendChild(b);
+  });
+}
+
+function elegirNombre(nombre) {
+  estado.nombre = nombre;
+  localStorage.setItem('maq_nombre', nombre);
+  mostrarHeaderNombre();
+  ir('home');
+  cargarMaquinas();
+}
+
+function cambiarNombre() {
+  ir('selector');
+}
+
+function mostrarHeaderNombre() {
+  document.getElementById('hdrQuien').classList.remove('oculto');
+  document.getElementById('hdrNombre').textContent = estado.nombre;
+}
+
+/* ====================== NAVEGACIÓN ====================== */
+var VISTAS = ['selector', 'home', 'combustible', 'labores', 'remitos', 'tareas'];
+
+function ir(vista) {
+  VISTAS.forEach(function (v) {
+    document.getElementById('v' + capitaliza_(v)).classList.add('oculto');
+  });
+  document.getElementById('v' + capitaliza_(vista)).classList.remove('oculto');
+
+  if (vista === 'combustible') { volverCombPaso1(); cargarCombustible(); }
+  if (vista === 'labores') { renderChipsMaquinasLab(); renderChipsTipoLabor(); cargarLabores(); }
+  if (vista === 'remitos') { cargarRemitos(); }
+  if (vista === 'tareas') { cerrarNuevaTarea(); cargarTareas(); }
+}
+
+function capitaliza_(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+
+/* ====================== LLAMADAS AL BACKEND ====================== */
+function llamar(fn, args) {
+  return fetch(BACKEND, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain' },
+    body: JSON.stringify({ fn: fn, args: args || [] })
+  })
+  .then(function (r) { return r.json(); })
+  .then(function (j) {
+    if (!j.ok) throw new Error(j.error || 'Error');
+    return j.r;
+  });
+}
+
+function mostrarToast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.remove('oculto');
+  setTimeout(function () { t.classList.add('oculto'); }, 2500);
+}
+
+/* ====================== MÁQUINAS ====================== */
+function cargarMaquinas() {
+  llamar('getMaquinas').then(function (r) {
+    estado.maquinas = r || [];
+  }).catch(function () {});
+}
+
+function renderChipsMaquinas_(contId, onClick, seleccionada) {
+  var cont = document.getElementById(contId);
+  cont.innerHTML = '';
+  estado.maquinas.forEach(function (m) {
+    var b = document.createElement('button');
+    b.className = 'chip' + (m.nombre === seleccionada ? ' sel' : '');
+    b.textContent = m.nombre;
+    b.onclick = function () { onClick(m.nombre); };
+    cont.appendChild(b);
+  });
+}
+
+/* ====================== COMBUSTIBLE ====================== */
+function combElegirTipo(tipo) {
+  estado.combTipo = tipo;
+  estado.combMaquina = '';
+  document.getElementById('combPaso1').classList.add('oculto');
+  document.getElementById('combPaso2').classList.remove('oculto');
+  document.getElementById('combTituloTipo').textContent = tipo === 'Carga a máquina'
+    ? '⛽ Cargando a una máquina' : '🛢️ Llegada al galpón';
+  document.getElementById('combLitros').value = '';
+
+  var campoMaq = document.getElementById('combCampoMaquina');
+  if (tipo === 'Carga a máquina') {
+    campoMaq.classList.remove('oculto');
+    renderChipsMaquinasComb_();
+  } else {
+    campoMaq.classList.add('oculto');
+  }
+}
+
+function renderChipsMaquinasComb_() {
+  renderChipsMaquinas_('chipsMaquinasComb', function (n) {
+    estado.combMaquina = n;
+    renderChipsMaquinasComb_();
+  }, estado.combMaquina);
+}
+
+function volverCombPaso1() {
+  document.getElementById('combPaso1').classList.remove('oculto');
+  document.getElementById('combPaso2').classList.add('oculto');
+}
+
+function guardarCombustibleUI() {
+  var litros = document.getElementById('combLitros').value;
+  if (!litros || Number(litros) <= 0) { mostrarToast('Falta la cantidad'); return; }
+  if (estado.combTipo === 'Carga a máquina' && !estado.combMaquina) { mostrarToast('Elegí la máquina'); return; }
+
+  llamar('guardarCombustible', [{
+    tipo: estado.combTipo, maquina: estado.combMaquina,
+    litros: litros, quien: estado.nombre
+  }]).then(function () {
+    mostrarToast('Guardado ✓');
+    volverCombPaso1();
+    cargarCombustible();
+  }).catch(function (e) { mostrarToast('Error: ' + e.message); });
+}
+
+function cargarCombustible() {
+  llamar('getCombustible', [15]).then(function (r) {
+    var cont = document.getElementById('listaCombustible');
+    cont.innerHTML = '';
+    (r || []).forEach(function (c) {
+      var div = document.createElement('div');
+      div.className = 'item';
+      div.innerHTML =
+        '<div class="fila1"><span>' + fFecha_(c.fecha) + '</span><span>' + (c.quien || '') + '</span></div>' +
+        '<div class="titulo">' + c.litros + ' L — ' + c.tipo + (c.maquina ? ' · ' + c.maquina : '') + '</div>';
+      cont.appendChild(div);
+    });
+  }).catch(function () {});
+}
+
+/* ====================== LABORES ====================== */
+var labMaquinaSel = '';
+var labTipoSel = '';
+
+function renderChipsMaquinasLab() {
+  renderChipsMaquinas_('chipsMaquinasLab', function (n) {
+    labMaquinaSel = n;
+    renderChipsMaquinasLab();
+  }, labMaquinaSel);
+}
+
+function renderChipsTipoLabor() {
+  var cont = document.getElementById('chipsTipoLabor');
+  cont.innerHTML = '';
+  TIPOS_LABOR.forEach(function (t) {
+    var b = document.createElement('button');
+    b.className = 'chip' + (t === labTipoSel ? ' sel' : '');
+    b.textContent = t;
+    b.onclick = function () { labTipoSel = t; renderChipsTipoLabor(); };
+    cont.appendChild(b);
+  });
+}
+
+function guardarLaborUI() {
+  var desc = document.getElementById('labDescripcion').value;
+  if (!labMaquinaSel) { mostrarToast('Elegí la máquina'); return; }
+  if (!labTipoSel) { mostrarToast('Elegí el tipo'); return; }
+
+  llamar('guardarLabor', [{
+    maquina: labMaquinaSel, tipo: labTipoSel, descripcion: desc, quien: estado.nombre
+  }]).then(function () {
+    mostrarToast('Guardado ✓');
+    document.getElementById('labDescripcion').value = '';
+    labMaquinaSel = ''; labTipoSel = '';
+    renderChipsMaquinasLab(); renderChipsTipoLabor();
+    cargarLabores();
+  }).catch(function (e) { mostrarToast('Error: ' + e.message); });
+}
+
+function cargarLabores() {
+  llamar('getLabores', [15]).then(function (r) {
+    var cont = document.getElementById('listaLabores');
+    cont.innerHTML = '';
+    (r || []).forEach(function (l) {
+      var div = document.createElement('div');
+      div.className = 'item';
+      div.innerHTML =
+        '<div class="fila1"><span>' + fFecha_(l.fecha) + '</span><span>' + (l.quien || '') + '</span></div>' +
+        '<div class="titulo">' + l.maquina + ' — ' + l.tipo + '</div>' +
+        (l.descripcion ? '<div class="desc">' + escHtml_(l.descripcion) + '</div>' : '');
+      cont.appendChild(div);
+    });
+  }).catch(function () {});
+}
+
+/* ====================== REMITOS ====================== */
+function remFotoElegida(ev) {
+  var file = ev.target.files[0];
+  if (!file) return;
+  comprimirImagen_(file, function (dataUrl) {
+    estado.remFotoDataUrl = dataUrl;
+    var img = document.getElementById('remPreview');
+    img.src = dataUrl;
+    img.style.display = 'block';
+  });
+}
+
+function guardarRemitoUI() {
+  if (!estado.remFotoDataUrl) { mostrarToast('Sacá la foto primero'); return; }
+  var desc = document.getElementById('remDescripcion').value;
+
+  mostrarToast('Subiendo...');
+  llamar('subirRemito', [{
+    foto: estado.remFotoDataUrl, descripcion: desc, quien: estado.nombre
+  }]).then(function () {
+    mostrarToast('Remito subido ✓');
+    estado.remFotoDataUrl = '';
+    document.getElementById('remPreview').style.display = 'none';
+    document.getElementById('remDescripcion').value = '';
+    document.getElementById('remInput').value = '';
+    cargarRemitos();
+  }).catch(function (e) { mostrarToast('Error: ' + e.message); });
+}
+
+function cargarRemitos() {
+  llamar('getRemitos', [10]).then(function (r) {
+    var cont = document.getElementById('listaRemitos');
+    cont.innerHTML = '';
+    (r || []).forEach(function (rem) {
+      var div = document.createElement('div');
+      div.className = 'item';
+      div.innerHTML =
+        '<div class="fila1"><span>' + fFecha_(rem.fecha) + '</span><span>' + (rem.quien || '') + '</span></div>' +
+        (rem.descripcion ? '<div class="desc">' + escHtml_(rem.descripcion) + '</div>' : '') +
+        (rem.foto ? '<img src="' + rem.foto + '">' : '');
+      cont.appendChild(div);
+    });
+  }).catch(function () {});
+}
+
+/* ====================== TAREAS ====================== */
+function abrirNuevaTarea() {
+  document.getElementById('formNuevaTarea').classList.remove('oculto');
+}
+function cerrarNuevaTarea() {
+  document.getElementById('formNuevaTarea').classList.add('oculto');
+  document.getElementById('tarTexto').value = '';
+  document.getElementById('tarPreview').style.display = 'none';
+  document.getElementById('tarInput').value = '';
+  estado.tarFotoDataUrl = '';
+}
+
+function tarFotoElegida(ev) {
+  var file = ev.target.files[0];
+  if (!file) return;
+  comprimirImagen_(file, function (dataUrl) {
+    estado.tarFotoDataUrl = dataUrl;
+    var img = document.getElementById('tarPreview');
+    img.src = dataUrl;
+    img.style.display = 'block';
+  });
+}
+
+function guardarTareaUI() {
+  var texto = document.getElementById('tarTexto').value.trim();
+  if (!texto) { mostrarToast('Escribí la tarea'); return; }
+
+  llamar('crearTarea', [{
+    texto: texto, foto: estado.tarFotoDataUrl, quien: estado.nombre
+  }]).then(function () {
+    mostrarToast('Tarea creada ✓');
+    cerrarNuevaTarea();
+    cargarTareas();
+  }).catch(function (e) { mostrarToast('Error: ' + e.message); });
+}
+
+function cargarTareas() {
+  llamar('getTareas').then(function (r) {
+    var pend = (r || []).filter(function (t) { return t.estado === 'Pendiente'; });
+    var hechas = (r || []).filter(function (t) { return t.estado !== 'Pendiente'; });
+
+    document.getElementById('contTareas').textContent = pend.length
+      ? pend.length + ' pendiente' + (pend.length === 1 ? '' : 's')
+      : 'a hacer';
+
+    var contP = document.getElementById('listaTareasPend');
+    contP.innerHTML = pend.length ? '' : '<p style="color:var(--muted);font-size:14px;">Sin pendientes.</p>';
+    pend.forEach(function (t) { contP.appendChild(renderTarea_(t, false)); });
+
+    var contH = document.getElementById('listaTareasHechas');
+    contH.innerHTML = hechas.length ? '' : '<p style="color:var(--muted);font-size:14px;">Nada todavía.</p>';
+    hechas.forEach(function (t) { contH.appendChild(renderTarea_(t, true)); });
+  }).catch(function () {});
+}
+
+function renderTarea_(t, hecha) {
+  var div = document.createElement('div');
+  div.className = 'tarea' + (hecha ? ' hecha' : '');
+  var check = document.createElement('div');
+  check.className = 'check';
+  check.onclick = function () {
+    if (hecha) { reabrirTareaUI(t.id); } else { marcarHechaUI(t.id); }
+  };
+  var cont = document.createElement('div');
+  cont.className = 'cont';
+  cont.innerHTML =
+    '<div class="txt">' + escHtml_(t.texto) + '</div>' +
+    '<div class="meta">' + (hecha
+      ? 'Hecha por ' + (t.hechaPor || '') + ' · ' + fFecha_(t.hechaEl)
+      : 'Creada por ' + (t.creadaPor || '') + ' · ' + fFecha_(t.creadaEl)) + '</div>' +
+    (t.foto ? '<img src="' + t.foto + '">' : '');
+  div.appendChild(check);
+  div.appendChild(cont);
+  return div;
+}
+
+function marcarHechaUI(id) {
+  llamar('marcarTareaHecha', [id, estado.nombre]).then(function () {
+    mostrarToast('Marcada como hecha ✓');
+    cargarTareas();
+  }).catch(function (e) { mostrarToast('Error: ' + e.message); });
+}
+
+function reabrirTareaUI(id) {
+  llamar('reabrirTarea', [id]).then(function () {
+    cargarTareas();
+  }).catch(function () {});
+}
+
+/* ====================== UTILIDADES ====================== */
+
+/** Achica la foto a 1400px antes de mandarla: una foto de celular pesa varios MB
+ * y en el campo la señal no da abasto para subirla entera. */
+function comprimirImagen_(file, cb) {
+  var reader = new FileReader();
+  reader.onload = function (e) {
+    var img = new Image();
+    img.onload = function () {
+      var max = 1400;
+      var w = img.width, h = img.height;
+      if (w > max || h > max) {
+        if (w > h) { h = Math.round(h * max / w); w = max; }
+        else { w = Math.round(w * max / h); h = max; }
+      }
+      var canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      cb(canvas.toDataURL('image/jpeg', 0.75));
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function fFecha_(iso) {
+  if (!iso) return '';
+  var p = iso.split('-');
+  if (p.length !== 3) return iso;
+  return p[2] + '/' + p[1] + '/' + p[0].slice(2);
+}
+
+function escHtml_(s) {
+  var d = document.createElement('div');
+  d.textContent = s || '';
+  return d.innerHTML;
+}
+</script>
+</body>
+</html>
