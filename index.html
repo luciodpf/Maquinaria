@@ -115,8 +115,9 @@
 
   .preview{width:100%;border-radius:12px;margin-bottom:12px;display:none;}
   input[type=file]{display:none;}
-  .btn-foto{background:#fff;border:2px dashed var(--borde);color:var(--muted);
-    border-radius:14px;padding:24px;text-align:center;font-weight:700;margin-bottom:16px;}
+  .btn-foto{display:block;background:#fff;border:2px dashed var(--borde);color:var(--muted);
+    border-radius:14px;padding:16px;text-align:center;font-weight:700;margin-bottom:16px;
+    font-size:14px;}
 
   .toast{position:fixed;left:16px;right:16px;bottom:20px;max-width:520px;margin:0 auto;
     background:var(--ink);color:#fff;padding:14px 18px;border-radius:12px;
@@ -544,9 +545,25 @@ function cargarRemitos() {
           (rem.monto ? ' — $' + rem.monto : '') + '</div>' +
         (rem.descripcion ? '<div class="desc">' + escHtml_(rem.descripcion) + '</div>' : '') +
         (rem.foto ? '<img src="' + rem.foto + '">' : '');
+
+      var borrar = document.createElement('button');
+      borrar.className = 'btn chico fantasma';
+      borrar.style.marginTop = '8px';
+      borrar.textContent = 'Borrar';
+      borrar.onclick = function () { borrarRemitoUI(rem.id); };
+      div.appendChild(borrar);
+
       cont.appendChild(div);
     });
   }).catch(function () {});
+}
+
+function borrarRemitoUI(id) {
+  if (!confirm('¿Borrar este remito? No se puede deshacer.')) return;
+  llamar('borrarRemito', [id]).then(function () {
+    mostrarToast('Borrado ✓');
+    cargarRemitos();
+  }).catch(function (e) { mostrarToast('Error: ' + e.message); });
 }
 
 /* ====================== TAREAS ====================== */
