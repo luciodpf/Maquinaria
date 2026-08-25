@@ -93,6 +93,10 @@
   .cat-lab{background:#e3f0e0;color:#2f7a3d;}
   .cat-log{background:#f7e8d4;color:#a8641a;}
   .cat-otros{background:#eae8e0;color:#6b6b60;}
+  .cat-gan{background:#f3e2e2;color:#8a3a3a;}
+
+  .tarea.soloLectura{opacity:.9;}
+  .origen-tag{font-size:11px;color:var(--accent2);font-weight:700;margin-top:4px;}
 
   .seccion-tit{font-size:14px;font-weight:700;color:var(--muted);
     text-transform:uppercase;letter-spacing:.03em;margin:20px 0 8px;}
@@ -287,13 +291,19 @@ var CATEGORIAS_TAREA = [
   { nombre: 'Reparación y Mantenimiento', clase: 'cat-rep' },
   { nombre: 'Laboreo y Agricultura', clase: 'cat-lab' },
   { nombre: 'Logística y mantenimiento de granos', clase: 'cat-log' },
+  { nombre: 'Labores Ganadería', clase: 'cat-gan' },
   { nombre: 'Otros', clase: 'cat-otros' }
 ];
+var CATEGORIA_DEFAULT = 'Otros';
 
 function claseCategoria_(nombre) {
   var c = CATEGORIAS_TAREA.filter(function (c) { return c.nombre === nombre; })[0];
   return c ? c.clase : 'cat-otros';
 }
+
+// Backend de Sanidad/Ganadería: mismo patrón doPost, sin sesión para esta
+// única función de solo lectura. Ver getReparacionesPublico() en su Codigo.gs.
+var GANADERIA_BACKEND = 'https://script.google.com/macros/s/AKfycby0vYipnm6pAt5EXKS3UUlCjORFrLe1FhbbFtq5Dt5EN778fW1VLuBYrPKwehvlXKRiBA/exec';
 
 /* ====================== ESTADO ====================== */
 var estado = {
@@ -302,7 +312,7 @@ var estado = {
   combMaquina: '',
   remFotoDataUrl: '',
   tarFotoDataUrl: '',
-  tarCategoriaSel: CATEGORIAS_TAREA[3].nombre, // "Otros" por defecto, así nunca queda vacía
+  tarCategoriaSel: CATEGORIA_DEFAULT, // "Otros" por defecto, así nunca queda vacía
   tarHechaSel: false,
   gruposAbiertos: { Pend: true, Hechas: true }
 };
@@ -335,6 +345,20 @@ function capitaliza_(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
 /* ====================== LLAMADAS AL BACKEND ====================== */
 function llamar(fn, args) {
   return fetch(BACKEND, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain' },
+    body: JSON.stringify({ fn: fn, args: args || [] })
+  })
+  .then(function (r) { return r.json(); })
+  .then(function (j) {
+    if (!j.ok) throw new Error(j.error || 'Error');
+    return j.r;
+  });
+}
+
+/** Mismo patrón, pero contra el backend de Sanidad/Ganadería (solo lectura). */
+function llamarGanaderia(fn, args) {
+  return fetch(GANADERIA_BACKEND, {
     method: 'POST',
     headers: { 'Content-Type': 'text/plain' },
     body: JSON.stringify({ fn: fn, args: args || [] })
@@ -538,7 +562,7 @@ function irNuevaTarea() {
   document.getElementById('tarPreview').style.display = 'none';
   document.getElementById('tarInput').value = '';
   estado.tarFotoDataUrl = '';
-  estado.tarCategoriaSel = CATEGORIAS_TAREA[3].nombre; // "Otros" por defecto
+  estado.tarCategoriaSel = CATEGORIA_DEFAULT;
   estado.tarHechaSel = false;
   renderChipsCategoriaTarea();
   renderTarHechaBtns();
@@ -608,10 +632,33 @@ function toggleGrupo(clave) {
     .classList.toggle('colapsado', !estado.gruposAbiertos[clave]);
 }
 
+/** Reparaciones de Sanidad/Ganadería, traducidas a la misma forma que una tarea local. */
+function mapearReparacionGanaderia_(r) {
+  return {
+    id: 'GAN-' + r.id,
+    texto: (r.tipo ? r.tipo + ': ' : '') + (r.que || ''),
+    maquina: [r.campo, r.donde].filter(Boolean).join(' — '),
+    categoria: 'Labores Ganadería',
+    foto: r.foto || '',
+    estado: r.estado === 'Resuelto' ? 'Hecha' : 'Pendiente',
+    creadaPor: r.responsable || '',
+    creadaEl: r.fecha || '',
+    hechaPor: r.resueltoPor || '',
+    hechaEl: r.resueltoEl || '',
+    origen: 'ganaderia'
+  };
+}
+
 function cargarTareas() {
-  llamar('getTareas').then(function (r) {
-    var pend = (r || []).filter(function (t) { return t.estado === 'Pendiente'; });
-    var hechas = (r || []).filter(function (t) { return t.estado !== 'Pendiente'; });
+  var propias = llamar('getTareas').catch(function () { return []; });
+  var ganaderia = llamarGanaderia('getReparacionesPublico')
+    .then(function (r) { return (r || []).map(mapearReparacionGanaderia_); })
+    .catch(function () { return []; }); // si Ganadería no responde, se ve igual lo propio
+
+  Promise.all([propias, ganaderia]).then(function (res) {
+    var r = (res[0] || []).concat(res[1] || []);
+    var pend = r.filter(function (t) { return t.estado === 'Pendiente'; });
+    var hechas = r.filter(function (t) { return t.estado !== 'Pendiente'; });
 
     document.getElementById('contTareas').textContent = pend.length
       ? pend.length + ' pendiente' + (pend.length === 1 ? '' : 's')
@@ -629,20 +676,26 @@ function cargarTareas() {
     var contH = document.getElementById('listaTareasHechas');
     contH.innerHTML = hechas.length ? '' : '<p style="color:var(--muted);font-size:14px;">Nada todavía.</p>';
     hechas.forEach(function (t) { contH.appendChild(renderTarea_(t, true)); });
-  }).catch(function () {});
+  });
 }
 
 function renderTarea_(t, hecha) {
+  var deGanaderia = t.origen === 'ganaderia';
   var div = document.createElement('div');
-  div.className = 'tarea' + (hecha ? ' hecha' : '');
+  div.className = 'tarea' + (hecha ? ' hecha' : '') + (deGanaderia ? ' soloLectura' : '');
 
   var check = document.createElement('div');
   check.className = 'check';
-  check.title = hecha ? 'Reabrir' : 'Marcar como hecha';
   check.textContent = hecha ? '✓' : '';
-  check.onclick = function () {
-    if (hecha) { reabrirTareaUI(t.id); } else { marcarHechaUI(t.id); }
-  };
+  if (deGanaderia) {
+    check.style.opacity = '.5';
+    check.title = 'Se resuelve desde la app de Ganadería';
+  } else {
+    check.title = hecha ? 'Reabrir' : 'Marcar como hecha';
+    check.onclick = function () {
+      if (hecha) { reabrirTareaUI(t.id); } else { marcarHechaUI(t.id); }
+    };
+  }
 
   var categoria = t.categoria || 'Otros';
   var cont = document.createElement('div');
@@ -654,14 +707,17 @@ function renderTarea_(t, hecha) {
     '<div class="meta">' + (hecha
       ? 'Hecha' + (t.hechaPor ? ' por ' + escHtml_(t.hechaPor) : '') + ' · ' + fFecha_(t.hechaEl)
       : 'Creada · ' + fFecha_(t.creadaEl)) + '</div>' +
+    (deGanaderia ? '<div class="origen-tag">🐄 desde Ganadería — se resuelve ahí</div>' : '') +
     (t.foto ? '<img src="' + t.foto + '">' : '');
 
-  var borrar = document.createElement('button');
-  borrar.className = 'btn chico fantasma';
-  borrar.style.marginTop = '8px';
-  borrar.textContent = 'Borrar';
-  borrar.onclick = function (ev) { ev.stopPropagation(); borrarTareaUI(t.id); };
-  cont.appendChild(borrar);
+  if (!deGanaderia) {
+    var borrar = document.createElement('button');
+    borrar.className = 'btn chico fantasma';
+    borrar.style.marginTop = '8px';
+    borrar.textContent = 'Borrar';
+    borrar.onclick = function (ev) { ev.stopPropagation(); borrarTareaUI(t.id); };
+    cont.appendChild(borrar);
+  }
 
   div.appendChild(check);
   div.appendChild(cont);
