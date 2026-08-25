@@ -24,9 +24,6 @@
     display:flex;align-items:center;justify-content:space-between;
     position:sticky;top:0;z-index:10;}
   header h1{font-size:18px;margin:0;font-weight:700;}
-  header .quien{font-size:13px;opacity:.9;display:flex;align-items:center;gap:8px;}
-  header .quien button{background:transparent;border:1px solid rgba(255,255,255,.5);
-    color:#fff;border-radius:8px;padding:4px 8px;font-size:12px;}
   main{max-width:520px;margin:0 auto;padding:16px;}
   .oculto{display:none !important;}
 
@@ -103,42 +100,27 @@
     background:var(--ink);color:#fff;padding:14px 18px;border-radius:12px;
     font-size:14px;text-align:center;z-index:50;box-shadow:0 4px 16px rgba(0,0,0,.2);}
 
-  .selectorNombre .chip{width:100%;text-align:center;padding:18px;font-size:17px;}
-  .selectorNombre .chips{flex-direction:column;}
 </style>
 </head>
 <body>
 
 <header>
   <h1>🔧 Maquinaria</h1>
-  <div class="quien oculto" id="hdrQuien">
-    <span id="hdrNombre"></span>
-    <button onclick="cambiarNombre()">cambiar</button>
-  </div>
 </header>
 
 <main>
 
-  <!-- ===================== SELECTOR DE NOMBRE ===================== -->
-  <section id="vSelector" class="selectorNombre">
-    <p style="font-weight:700;font-size:17px;margin-top:8px;">¿Quién sos?</p>
-    <div class="chips" id="chipsPersonas"></div>
-  </section>
-
   <!-- ===================== HOME ===================== -->
-  <section id="vHome" class="oculto">
+  <section id="vHome">
     <div class="grid2">
       <div class="tarjeta" onclick="ir('combustible')">
         <div class="ico">⛽</div>Combustible<small>cargar o llegada al galpón</small>
-      </div>
-      <div class="tarjeta" onclick="ir('labores')">
-        <div class="ico">🔩</div>Labores<small>reparación, service, mejora</small>
       </div>
       <div class="tarjeta" onclick="ir('remitos')">
         <div class="ico">🧾</div>Remitos<small>sacale foto y subilo</small>
       </div>
       <div class="tarjeta" onclick="ir('tareas')">
-        <div class="ico">✅</div>Tareas<small id="contTareas">a hacer</small>
+        <div class="ico">✅</div>Tareas<small id="contTareas">a hacer y hechas</small>
       </div>
     </div>
   </section>
@@ -169,33 +151,8 @@
         <input type="number" id="combLitros" inputmode="decimal" placeholder="0">
       </div>
 
-      <button class="btn grande" onclick="guardarCombustibleUI()">Guardar</button>
+      <button class="btn grande" onclick="guardarCombustibleUI(this)">Guardar</button>
     </div>
-  </section>
-
-  <!-- ===================== LABORES ===================== -->
-  <section id="vLabores" class="oculto">
-    <button class="volver" onclick="ir('home')">‹ Volver</button>
-
-    <div class="campo">
-      <label>Máquina / equipo</label>
-      <div class="maquinas" id="chipsMaquinasLab"></div>
-    </div>
-
-    <div class="campo">
-      <label>Tipo</label>
-      <div class="chips" id="chipsTipoLabor"></div>
-    </div>
-
-    <div class="campo">
-      <label>¿Qué se hizo / qué hay que hacer?</label>
-      <textarea id="labDescripcion" placeholder="Descripción..."></textarea>
-    </div>
-
-    <button class="btn grande" onclick="guardarLaborUI()">Guardar</button>
-
-    <div class="seccion-tit">Últimas labores</div>
-    <div class="lista" id="listaLabores"></div>
   </section>
 
   <!-- ===================== REMITOS ===================== -->
@@ -230,7 +187,7 @@
         <textarea id="remDescripcion" placeholder="Qué se compró..."></textarea>
       </div>
 
-      <button class="btn grande" onclick="guardarRemitoUI()">Subir remito</button>
+      <button class="btn grande" onclick="guardarRemitoUI(this)">Subir remito</button>
     </div>
 
     <div class="seccion-tit">Últimos remitos</div>
@@ -239,29 +196,55 @@
 
   <!-- ===================== TAREAS ===================== -->
   <section id="vTareas" class="oculto">
-    <button class="volver" onclick="ir('home')">‹ Volver</button>
 
-    <button class="btn grande verde" onclick="abrirNuevaTarea()">+ Nueva tarea</button>
+    <!-- --- lista (pantalla por defecto) --- -->
+    <div id="tarPaso1">
+      <button class="volver" onclick="ir('home')">‹ Volver</button>
 
-    <div id="formNuevaTarea" class="oculto">
+      <button class="btn grande verde" onclick="irNuevaTarea()">+ Nueva</button>
+
+      <div class="seccion-tit">Pendientes</div>
+      <div class="lista" id="listaTareasPend"></div>
+
+      <div class="seccion-tit">Hechas</div>
+      <div class="lista" id="listaTareasHechas"></div>
+    </div>
+
+    <!-- --- crear (pantalla separada, no expandible arriba de la lista) --- -->
+    <div id="tarPaso2" class="oculto">
+      <button class="volver" onclick="volverTarPaso1()">‹ Volver</button>
+
       <div class="campo">
-        <label>¿Qué hay que hacer?</label>
-        <textarea id="tarTexto" placeholder="Descripción de la tarea..."></textarea>
+        <label>¿Qué hay que hacer / qué se hizo?</label>
+        <textarea id="tarTexto" placeholder="Descripción..."></textarea>
       </div>
+
+      <div class="campo">
+        <label>Máquina / equipo (opcional)</label>
+        <input type="text" id="tarMaquina" placeholder="Ej: Pauny, New Holland TJ240...">
+      </div>
+
+      <div class="campo">
+        <label>Tipo (opcional)</label>
+        <div class="chips" id="chipsTipoTarea"></div>
+      </div>
+
       <label class="btn-foto" id="tarBtnFoto">
         📷 Agregar foto (opcional)
         <input type="file" id="tarInput" accept="image/*" capture="environment" onchange="tarFotoElegida(event)">
       </label>
       <img id="tarPreview" class="preview">
-      <button class="btn" onclick="guardarTareaUI()">Crear tarea</button>
-      <button class="btn fantasma" onclick="cerrarNuevaTarea()">Cancelar</button>
+
+      <div class="campo">
+        <label>¿Ya está hecho?</label>
+        <div class="chips">
+          <button type="button" class="chip" id="tarHechaNo" onclick="tarElegirHecha(false)">No, queda pendiente</button>
+          <button type="button" class="chip" id="tarHechaSi" onclick="tarElegirHecha(true)">Sí, ya se hizo</button>
+        </div>
+      </div>
+
+      <button class="btn grande" id="tarBtnGuardar" onclick="guardarTareaUI(this)">Guardar</button>
     </div>
-
-    <div class="seccion-tit">Pendientes</div>
-    <div class="lista" id="listaTareasPend"></div>
-
-    <div class="seccion-tit">Hechas</div>
-    <div class="lista" id="listaTareasHechas"></div>
   </section>
 
 </main>
@@ -272,65 +255,32 @@
 /* ====================== CONFIGURACIÓN ====================== */
 var BACKEND = 'https://script.google.com/macros/s/AKfycbxVQIf6LaUN0HNzIuTumP5FjF16CHCjLVoaWZA0hQMFHJRjZDGduCWindkiRfDfn3Y9EA/exec';
 
-var PERSONAS = ['Gutiérrez', 'Druetta', 'Gallo', 'Altuna L.', 'Roberto', 'Lucio', 'Daniel'];
-var TIPOS_LABOR = ['Reparación', 'Mantenimiento', 'Mejora', 'Cambio de piezas'];
+// Sin nombre por ahora: se saca a propósito hasta que haya login real por
+// persona. El "quién" en la planilla queda vacío mientras tanto.
+var TIPOS_TAREA = ['Reparación', 'Mantenimiento', 'Mejora', 'Cambio de piezas'];
 
 /* ====================== ESTADO ====================== */
 var estado = {
-  nombre: localStorage.getItem('maq_nombre') || '',
   maquinas: [],
   combTipo: '',
   combMaquina: '',
   remFotoDataUrl: '',
-  tarFotoDataUrl: ''
+  tarFotoDataUrl: '',
+  tarTipoSel: '',
+  tarHechaSel: false
 };
 
 /* ====================== ARRANQUE ====================== */
 document.addEventListener('DOMContentLoaded', function () {
-  renderChipsPersonas();
-  if (estado.nombre) {
-    mostrarHeaderNombre();
-    ir('home');
-    cargarMaquinas();
-  } else {
-    ir('selector');
-  }
+  ir('home');
+  cargarMaquinas();
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('sw.js').catch(function () {});
   }
 });
 
-function renderChipsPersonas() {
-  var cont = document.getElementById('chipsPersonas');
-  cont.innerHTML = '';
-  PERSONAS.forEach(function (p) {
-    var b = document.createElement('button');
-    b.className = 'chip';
-    b.textContent = p;
-    b.onclick = function () { elegirNombre(p); };
-    cont.appendChild(b);
-  });
-}
-
-function elegirNombre(nombre) {
-  estado.nombre = nombre;
-  localStorage.setItem('maq_nombre', nombre);
-  mostrarHeaderNombre();
-  ir('home');
-  cargarMaquinas();
-}
-
-function cambiarNombre() {
-  ir('selector');
-}
-
-function mostrarHeaderNombre() {
-  document.getElementById('hdrQuien').classList.remove('oculto');
-  document.getElementById('hdrNombre').textContent = estado.nombre;
-}
-
 /* ====================== NAVEGACIÓN ====================== */
-var VISTAS = ['selector', 'home', 'combustible', 'labores', 'remitos', 'tareas'];
+var VISTAS = ['home', 'combustible', 'remitos', 'tareas'];
 
 function ir(vista) {
   VISTAS.forEach(function (v) {
@@ -339,9 +289,8 @@ function ir(vista) {
   document.getElementById('v' + capitaliza_(vista)).classList.remove('oculto');
 
   if (vista === 'combustible') { volverCombPaso1(); cargarCombustible(); }
-  if (vista === 'labores') { renderChipsMaquinasLab(); renderChipsTipoLabor(); cargarLabores(); }
   if (vista === 'remitos') { cargarRemitos(); }
-  if (vista === 'tareas') { cerrarNuevaTarea(); cargarTareas(); }
+  if (vista === 'tareas') { volverTarPaso1(); cargarTareas(); }
 }
 
 function capitaliza_(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
@@ -365,6 +314,21 @@ function mostrarToast(msg) {
   t.textContent = msg;
   t.classList.remove('oculto');
   setTimeout(function () { t.classList.add('oculto'); }, 2500);
+}
+
+/**
+ * Deshabilita el botón y le cambia el texto mientras la promesa está en
+ * vuelo, así queda claro que algo está pasando y no que se colgó — Apps
+ * Script a veces tarda unos segundos en la primera llamada.
+ */
+function conCarga_(btn, textoCarga, promesa) {
+  var original = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = textoCarga;
+  return promesa.finally(function () {
+    btn.disabled = false;
+    btn.textContent = original;
+  });
 }
 
 /* ====================== MÁQUINAS ====================== */
@@ -417,15 +381,15 @@ function volverCombPaso1() {
   document.getElementById('combPaso2').classList.add('oculto');
 }
 
-function guardarCombustibleUI() {
+function guardarCombustibleUI(btn) {
   var litros = document.getElementById('combLitros').value;
   if (!litros || Number(litros) <= 0) { mostrarToast('Falta la cantidad'); return; }
   if (estado.combTipo === 'Carga a máquina' && !estado.combMaquina) { mostrarToast('Elegí la máquina'); return; }
 
-  llamar('guardarCombustible', [{
+  conCarga_(btn, 'Guardando...', llamar('guardarCombustible', [{
     tipo: estado.combTipo, maquina: estado.combMaquina,
-    litros: litros, quien: estado.nombre
-  }]).then(function () {
+    litros: litros, quien: ''
+  }])).then(function () {
     mostrarToast('Guardado ✓');
     volverCombPaso1();
     cargarCombustible();
@@ -442,61 +406,6 @@ function cargarCombustible() {
       div.innerHTML =
         '<div class="fila1"><span>' + fFecha_(c.fecha) + '</span><span>' + (c.quien || '') + '</span></div>' +
         '<div class="titulo">' + c.litros + ' L — ' + c.tipo + (c.maquina ? ' · ' + c.maquina : '') + '</div>';
-      cont.appendChild(div);
-    });
-  }).catch(function () {});
-}
-
-/* ====================== LABORES ====================== */
-var labMaquinaSel = '';
-var labTipoSel = '';
-
-function renderChipsMaquinasLab() {
-  renderChipsMaquinas_('chipsMaquinasLab', function (n) {
-    labMaquinaSel = n;
-    renderChipsMaquinasLab();
-  }, labMaquinaSel);
-}
-
-function renderChipsTipoLabor() {
-  var cont = document.getElementById('chipsTipoLabor');
-  cont.innerHTML = '';
-  TIPOS_LABOR.forEach(function (t) {
-    var b = document.createElement('button');
-    b.className = 'chip' + (t === labTipoSel ? ' sel' : '');
-    b.textContent = t;
-    b.onclick = function () { labTipoSel = t; renderChipsTipoLabor(); };
-    cont.appendChild(b);
-  });
-}
-
-function guardarLaborUI() {
-  var desc = document.getElementById('labDescripcion').value;
-  if (!labMaquinaSel) { mostrarToast('Elegí la máquina'); return; }
-  if (!labTipoSel) { mostrarToast('Elegí el tipo'); return; }
-
-  llamar('guardarLabor', [{
-    maquina: labMaquinaSel, tipo: labTipoSel, descripcion: desc, quien: estado.nombre
-  }]).then(function () {
-    mostrarToast('Guardado ✓');
-    document.getElementById('labDescripcion').value = '';
-    labMaquinaSel = ''; labTipoSel = '';
-    renderChipsMaquinasLab(); renderChipsTipoLabor();
-    cargarLabores();
-  }).catch(function (e) { mostrarToast('Error: ' + e.message); });
-}
-
-function cargarLabores() {
-  llamar('getLabores', [15]).then(function (r) {
-    var cont = document.getElementById('listaLabores');
-    cont.innerHTML = '';
-    (r || []).forEach(function (l) {
-      var div = document.createElement('div');
-      div.className = 'item';
-      div.innerHTML =
-        '<div class="fila1"><span>' + fFecha_(l.fecha) + '</span><span>' + (l.quien || '') + '</span></div>' +
-        '<div class="titulo">' + l.maquina + ' — ' + l.tipo + '</div>' +
-        (l.descripcion ? '<div class="desc">' + escHtml_(l.descripcion) + '</div>' : '');
       cont.appendChild(div);
     });
   }).catch(function () {});
@@ -536,7 +445,7 @@ function remFotoElegida(ev) {
   });
 }
 
-function guardarRemitoUI() {
+function guardarRemitoUI(btn) {
   if (!estado.remFotoDataUrl) { mostrarToast('Sacá la foto primero'); return; }
 
   var fecha = document.getElementById('remFecha').value;
@@ -544,11 +453,10 @@ function guardarRemitoUI() {
   var monto = document.getElementById('remMonto').value;
   var desc = document.getElementById('remDescripcion').value;
 
-  mostrarToast('Subiendo...');
-  llamar('subirRemito', [{
+  conCarga_(btn, 'Subiendo...', llamar('subirRemito', [{
     foto: estado.remFotoDataUrl, fecha: fecha, proveedor: proveedor,
-    monto: monto, descripcion: desc, quien: estado.nombre
-  }]).then(function () {
+    monto: monto, descripcion: desc, quien: ''
+  }])).then(function () {
     mostrarToast('Remito subido ✓');
     estado.remFotoDataUrl = '';
     document.getElementById('remPreview').style.display = 'none';
@@ -581,15 +489,52 @@ function cargarRemitos() {
 }
 
 /* ====================== TAREAS ====================== */
-function abrirNuevaTarea() {
-  document.getElementById('formNuevaTarea').classList.remove('oculto');
-}
-function cerrarNuevaTarea() {
-  document.getElementById('formNuevaTarea').classList.add('oculto');
+
+/* --- navegación entre lista y creación: pasos separados, no un acordeón
+   arriba de la lista, para que crear no reordene nada bajo el dedo --- */
+function irNuevaTarea() {
+  document.getElementById('tarPaso1').classList.add('oculto');
+  document.getElementById('tarPaso2').classList.remove('oculto');
+
   document.getElementById('tarTexto').value = '';
+  document.getElementById('tarMaquina').value = '';
   document.getElementById('tarPreview').style.display = 'none';
   document.getElementById('tarInput').value = '';
   estado.tarFotoDataUrl = '';
+  estado.tarTipoSel = '';
+  estado.tarHechaSel = false;
+  renderChipsTipoTarea();
+  renderTarHechaBtns();
+}
+
+function volverTarPaso1() {
+  document.getElementById('tarPaso1').classList.remove('oculto');
+  document.getElementById('tarPaso2').classList.add('oculto');
+}
+
+function renderChipsTipoTarea() {
+  var cont = document.getElementById('chipsTipoTarea');
+  cont.innerHTML = '';
+  TIPOS_TAREA.forEach(function (t) {
+    var b = document.createElement('button');
+    b.className = 'chip' + (t === estado.tarTipoSel ? ' sel' : '');
+    b.textContent = t;
+    b.onclick = function () {
+      estado.tarTipoSel = (estado.tarTipoSel === t) ? '' : t;  // tocar de nuevo deselecciona
+      renderChipsTipoTarea();
+    };
+    cont.appendChild(b);
+  });
+}
+
+function tarElegirHecha(hecha) {
+  estado.tarHechaSel = hecha;
+  renderTarHechaBtns();
+}
+
+function renderTarHechaBtns() {
+  document.getElementById('tarHechaNo').classList.toggle('sel', !estado.tarHechaSel);
+  document.getElementById('tarHechaSi').classList.toggle('sel', estado.tarHechaSel);
 }
 
 function tarFotoElegida(ev) {
@@ -603,15 +548,17 @@ function tarFotoElegida(ev) {
   });
 }
 
-function guardarTareaUI() {
+function guardarTareaUI(btn) {
   var texto = document.getElementById('tarTexto').value.trim();
-  if (!texto) { mostrarToast('Escribí la tarea'); return; }
+  if (!texto) { mostrarToast('Escribí qué hay que hacer'); return; }
+  var maquina = document.getElementById('tarMaquina').value.trim();
 
-  llamar('crearTarea', [{
-    texto: texto, foto: estado.tarFotoDataUrl, quien: estado.nombre
-  }]).then(function () {
-    mostrarToast('Tarea creada ✓');
-    cerrarNuevaTarea();
+  conCarga_(btn, 'Guardando...', llamar('crearTarea', [{
+    texto: texto, maquina: maquina, tipo: estado.tarTipoSel,
+    foto: estado.tarFotoDataUrl, yaHecha: estado.tarHechaSel, quien: ''
+  }])).then(function () {
+    mostrarToast(estado.tarHechaSel ? 'Cargado como hecho ✓' : 'Tarea creada ✓');
+    volverTarPaso1();
     cargarTareas();
   }).catch(function (e) { mostrarToast('Error: ' + e.message); });
 }
@@ -623,7 +570,7 @@ function cargarTareas() {
 
     document.getElementById('contTareas').textContent = pend.length
       ? pend.length + ' pendiente' + (pend.length === 1 ? '' : 's')
-      : 'a hacer';
+      : 'a hacer y hechas';
 
     var contP = document.getElementById('listaTareasPend');
     contP.innerHTML = pend.length ? '' : '<p style="color:var(--muted);font-size:14px;">Sin pendientes.</p>';
@@ -638,26 +585,39 @@ function cargarTareas() {
 function renderTarea_(t, hecha) {
   var div = document.createElement('div');
   div.className = 'tarea' + (hecha ? ' hecha' : '');
+
   var check = document.createElement('div');
   check.className = 'check';
+  check.title = hecha ? 'Reabrir' : 'Marcar como hecha';
   check.onclick = function () {
     if (hecha) { reabrirTareaUI(t.id); } else { marcarHechaUI(t.id); }
   };
+
   var cont = document.createElement('div');
   cont.className = 'cont';
+  var etiqueta = [t.maquina, t.tipo].filter(Boolean).join(' — ');
   cont.innerHTML =
+    (etiqueta ? '<div class="meta" style="font-weight:700;">' + escHtml_(etiqueta) + '</div>' : '') +
     '<div class="txt">' + escHtml_(t.texto) + '</div>' +
     '<div class="meta">' + (hecha
-      ? 'Hecha por ' + (t.hechaPor || '') + ' · ' + fFecha_(t.hechaEl)
-      : 'Creada por ' + (t.creadaPor || '') + ' · ' + fFecha_(t.creadaEl)) + '</div>' +
+      ? 'Hecha' + (t.hechaPor ? ' por ' + escHtml_(t.hechaPor) : '') + ' · ' + fFecha_(t.hechaEl)
+      : 'Creada · ' + fFecha_(t.creadaEl)) + '</div>' +
     (t.foto ? '<img src="' + t.foto + '">' : '');
+
+  var borrar = document.createElement('button');
+  borrar.className = 'btn chico fantasma';
+  borrar.style.marginTop = '8px';
+  borrar.textContent = 'Borrar';
+  borrar.onclick = function (ev) { ev.stopPropagation(); borrarTareaUI(t.id); };
+  cont.appendChild(borrar);
+
   div.appendChild(check);
   div.appendChild(cont);
   return div;
 }
 
 function marcarHechaUI(id) {
-  llamar('marcarTareaHecha', [id, estado.nombre]).then(function () {
+  llamar('marcarTareaHecha', [id, '']).then(function () {
     mostrarToast('Marcada como hecha ✓');
     cargarTareas();
   }).catch(function (e) { mostrarToast('Error: ' + e.message); });
@@ -665,8 +625,17 @@ function marcarHechaUI(id) {
 
 function reabrirTareaUI(id) {
   llamar('reabrirTarea', [id]).then(function () {
+    mostrarToast('Reabierta ✓');
     cargarTareas();
-  }).catch(function () {});
+  }).catch(function (e) { mostrarToast('Error: ' + e.message); });
+}
+
+function borrarTareaUI(id) {
+  if (!confirm('¿Borrar esta tarea? No se puede deshacer.')) return;
+  llamar('borrarTarea', [id]).then(function () {
+    mostrarToast('Borrada ✓');
+    cargarTareas();
+  }).catch(function (e) { mostrarToast('Error: ' + e.message); });
 }
 
 /* ====================== UTILIDADES ====================== */
