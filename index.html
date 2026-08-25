@@ -208,12 +208,30 @@
     </label>
     <img id="remPreview" class="preview">
 
-    <div class="campo">
-      <label>Descripción (opcional)</label>
-      <textarea id="remDescripcion" placeholder="Qué se compró..."></textarea>
+    <div id="remLeyendo" class="oculto" style="text-align:center;color:var(--muted);font-weight:700;margin-bottom:16px;">
+      🔎 Leyendo el remito...
     </div>
 
-    <button class="btn grande" onclick="guardarRemitoUI()">Subir remito</button>
+    <div id="remCampos" class="oculto">
+      <div class="campo">
+        <label>Fecha</label>
+        <input type="text" id="remFecha" placeholder="AAAA-MM-DD">
+      </div>
+      <div class="campo">
+        <label>Proveedor</label>
+        <input type="text" id="remProveedor" placeholder="Comercio o proveedor">
+      </div>
+      <div class="campo">
+        <label>Monto</label>
+        <input type="number" id="remMonto" inputmode="decimal" placeholder="0">
+      </div>
+      <div class="campo">
+        <label>Ítems / detalle</label>
+        <textarea id="remDescripcion" placeholder="Qué se compró..."></textarea>
+      </div>
+
+      <button class="btn grande" onclick="guardarRemitoUI()">Subir remito</button>
+    </div>
 
     <div class="seccion-tit">Últimos remitos</div>
     <div class="lista" id="listaRemitos"></div>
@@ -493,20 +511,51 @@ function remFotoElegida(ev) {
     var img = document.getElementById('remPreview');
     img.src = dataUrl;
     img.style.display = 'block';
+
+    // Fecha de hoy como default, por si la lectura automática falla o no la trae.
+    document.getElementById('remFecha').value = new Date().toISOString().slice(0, 10);
+    document.getElementById('remProveedor').value = '';
+    document.getElementById('remMonto').value = '';
+    document.getElementById('remDescripcion').value = '';
+
+    document.getElementById('remCampos').classList.remove('oculto');
+    document.getElementById('remLeyendo').classList.remove('oculto');
+
+    llamar('leerRemito', [dataUrl]).then(function (r) {
+      var l = (r && r.lectura) || {};
+      if (l.fecha) document.getElementById('remFecha').value = l.fecha;
+      if (l.proveedor) document.getElementById('remProveedor').value = l.proveedor;
+      if (l.monto) document.getElementById('remMonto').value = l.monto;
+      if (l.items) document.getElementById('remDescripcion').value = l.items;
+      document.getElementById('remLeyendo').classList.add('oculto');
+      mostrarToast('Leído ✓ — revisá y corregí si hace falta');
+    }).catch(function (e) {
+      document.getElementById('remLeyendo').classList.add('oculto');
+      mostrarToast('No se pudo leer solo (' + e.message + ') — completá a mano');
+    });
   });
 }
 
 function guardarRemitoUI() {
   if (!estado.remFotoDataUrl) { mostrarToast('Sacá la foto primero'); return; }
+
+  var fecha = document.getElementById('remFecha').value;
+  var proveedor = document.getElementById('remProveedor').value;
+  var monto = document.getElementById('remMonto').value;
   var desc = document.getElementById('remDescripcion').value;
 
   mostrarToast('Subiendo...');
   llamar('subirRemito', [{
-    foto: estado.remFotoDataUrl, descripcion: desc, quien: estado.nombre
+    foto: estado.remFotoDataUrl, fecha: fecha, proveedor: proveedor,
+    monto: monto, descripcion: desc, quien: estado.nombre
   }]).then(function () {
     mostrarToast('Remito subido ✓');
     estado.remFotoDataUrl = '';
     document.getElementById('remPreview').style.display = 'none';
+    document.getElementById('remCampos').classList.add('oculto');
+    document.getElementById('remFecha').value = '';
+    document.getElementById('remProveedor').value = '';
+    document.getElementById('remMonto').value = '';
     document.getElementById('remDescripcion').value = '';
     document.getElementById('remInput').value = '';
     cargarRemitos();
@@ -522,6 +571,8 @@ function cargarRemitos() {
       div.className = 'item';
       div.innerHTML =
         '<div class="fila1"><span>' + fFecha_(rem.fecha) + '</span><span>' + (rem.quien || '') + '</span></div>' +
+        '<div class="titulo">' + escHtml_(rem.proveedor || 'Sin proveedor') +
+          (rem.monto ? ' — $' + rem.monto : '') + '</div>' +
         (rem.descripcion ? '<div class="desc">' + escHtml_(rem.descripcion) + '</div>' : '') +
         (rem.foto ? '<img src="' + rem.foto + '">' : '');
       cont.appendChild(div);
