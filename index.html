@@ -78,18 +78,36 @@
 
   .tarea{background:var(--panel);border:1px solid var(--borde);border-radius:12px;
     padding:12px 14px;margin-bottom:8px;display:flex;gap:12px;align-items:flex-start;}
-  .tarea.hecha{opacity:.55;}
-  .tarea .check{width:26px;height:26px;border-radius:50%;border:2px solid var(--verde);
-    flex:0 0 auto;margin-top:2px;background:#fff;}
-  .tarea.hecha .check{background:var(--verde);}
-  .tarea .cont{flex:1;}
-  .tarea .txt{font-size:15px;font-weight:600;}
-  .tarea.hecha .txt{text-decoration:line-through;}
+  .tarea .check{width:26px;height:26px;border-radius:50%;border:2px solid #c7c4b8;
+    flex:0 0 auto;margin-top:2px;background:#fff;display:flex;align-items:center;
+    justify-content:center;color:#fff;font-size:15px;font-weight:700;}
+  .tarea.hecha .check{background:var(--accent2);border-color:var(--accent2);}
+  .tarea .cont{flex:1;min-width:0;}
+  .tarea .txt{font-size:15px;font-weight:600;margin-top:6px;}
   .tarea .meta{font-size:12px;color:var(--muted);margin-top:2px;}
   .tarea img{max-width:100%;border-radius:8px;margin-top:8px;}
 
+  .cat-pill{display:inline-block;padding:4px 10px;border-radius:999px;
+    font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.02em;}
+  .cat-rep{background:#e2ecf3;color:#2a5878;}
+  .cat-lab{background:#e3f0e0;color:#2f7a3d;}
+  .cat-log{background:#f7e8d4;color:#a8641a;}
+  .cat-otros{background:#eae8e0;color:#6b6b60;}
+
   .seccion-tit{font-size:14px;font-weight:700;color:var(--muted);
     text-transform:uppercase;letter-spacing:.03em;margin:20px 0 8px;}
+
+  .grupo-tit{display:flex;align-items:center;gap:10px;padding:12px 14px;
+    border-radius:12px;font-weight:700;font-size:13px;letter-spacing:.02em;
+    margin:16px 0 8px;cursor:pointer;}
+  .grupo-tit.pendiente{background:#faf1d6;color:#8a6a12;}
+  .grupo-tit.hecha{background:#e3f0e0;color:#2f7a3d;}
+  .grupo-num{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;
+    justify-content:center;font-size:12px;color:#fff;flex:0 0 auto;}
+  .grupo-tit.pendiente .grupo-num{background:#c98a12;}
+  .grupo-tit.hecha .grupo-num{background:#46562a;}
+  .grupo-flecha{margin-left:auto;transition:transform .15s;}
+  .grupo-tit.colapsado .grupo-flecha{transform:rotate(-90deg);}
 
   .preview{width:100%;border-radius:12px;margin-bottom:12px;display:none;}
   input[type=file]{display:none;}
@@ -203,10 +221,18 @@
 
       <button class="btn grande verde" onclick="irNuevaTarea()">+ Nueva</button>
 
-      <div class="seccion-tit">Pendientes</div>
+      <div class="grupo-tit pendiente" id="titPend" onclick="toggleGrupo('Pend')">
+        <span class="grupo-num" id="numPend">0</span>
+        <span id="txtPend">PENDIENTES</span>
+        <span class="grupo-flecha" id="flechaPend">▾</span>
+      </div>
       <div class="lista" id="listaTareasPend"></div>
 
-      <div class="seccion-tit">Hechas</div>
+      <div class="grupo-tit hecha" id="titHechas" onclick="toggleGrupo('Hechas')">
+        <span class="grupo-num" id="numHechas">0</span>
+        <span id="txtHechas">COMPLETADAS</span>
+        <span class="grupo-flecha" id="flechaHechas">▾</span>
+      </div>
       <div class="lista" id="listaTareasHechas"></div>
     </div>
 
@@ -225,8 +251,8 @@
       </div>
 
       <div class="campo">
-        <label>Tipo (opcional)</label>
-        <div class="chips" id="chipsTipoTarea"></div>
+        <label>Categoría</label>
+        <div class="chips" id="chipsCategoriaTarea"></div>
       </div>
 
       <label class="btn-foto" id="tarBtnFoto">
@@ -257,7 +283,17 @@ var BACKEND = 'https://script.google.com/macros/s/AKfycbxVQIf6LaUN0HNzIuTumP5FjF
 
 // Sin nombre por ahora: se saca a propósito hasta que haya login real por
 // persona. El "quién" en la planilla queda vacío mientras tanto.
-var TIPOS_TAREA = ['Reparación', 'Mantenimiento', 'Mejora', 'Cambio de piezas'];
+var CATEGORIAS_TAREA = [
+  { nombre: 'Reparación y Mantenimiento', clase: 'cat-rep' },
+  { nombre: 'Laboreo y Agricultura', clase: 'cat-lab' },
+  { nombre: 'Logística y mantenimiento de granos', clase: 'cat-log' },
+  { nombre: 'Otros', clase: 'cat-otros' }
+];
+
+function claseCategoria_(nombre) {
+  var c = CATEGORIAS_TAREA.filter(function (c) { return c.nombre === nombre; })[0];
+  return c ? c.clase : 'cat-otros';
+}
 
 /* ====================== ESTADO ====================== */
 var estado = {
@@ -266,8 +302,9 @@ var estado = {
   combMaquina: '',
   remFotoDataUrl: '',
   tarFotoDataUrl: '',
-  tarTipoSel: '',
-  tarHechaSel: false
+  tarCategoriaSel: CATEGORIAS_TAREA[3].nombre, // "Otros" por defecto, así nunca queda vacía
+  tarHechaSel: false,
+  gruposAbiertos: { Pend: true, Hechas: true }
 };
 
 /* ====================== ARRANQUE ====================== */
@@ -501,9 +538,9 @@ function irNuevaTarea() {
   document.getElementById('tarPreview').style.display = 'none';
   document.getElementById('tarInput').value = '';
   estado.tarFotoDataUrl = '';
-  estado.tarTipoSel = '';
+  estado.tarCategoriaSel = CATEGORIAS_TAREA[3].nombre; // "Otros" por defecto
   estado.tarHechaSel = false;
-  renderChipsTipoTarea();
+  renderChipsCategoriaTarea();
   renderTarHechaBtns();
 }
 
@@ -512,16 +549,16 @@ function volverTarPaso1() {
   document.getElementById('tarPaso2').classList.add('oculto');
 }
 
-function renderChipsTipoTarea() {
-  var cont = document.getElementById('chipsTipoTarea');
+function renderChipsCategoriaTarea() {
+  var cont = document.getElementById('chipsCategoriaTarea');
   cont.innerHTML = '';
-  TIPOS_TAREA.forEach(function (t) {
+  CATEGORIAS_TAREA.forEach(function (c) {
     var b = document.createElement('button');
-    b.className = 'chip' + (t === estado.tarTipoSel ? ' sel' : '');
-    b.textContent = t;
+    b.className = 'chip' + (c.nombre === estado.tarCategoriaSel ? ' sel' : '');
+    b.textContent = c.nombre;
     b.onclick = function () {
-      estado.tarTipoSel = (estado.tarTipoSel === t) ? '' : t;  // tocar de nuevo deselecciona
-      renderChipsTipoTarea();
+      estado.tarCategoriaSel = c.nombre;  // siempre una elegida, no se puede deseleccionar
+      renderChipsCategoriaTarea();
     };
     cont.appendChild(b);
   });
@@ -554,13 +591,21 @@ function guardarTareaUI(btn) {
   var maquina = document.getElementById('tarMaquina').value.trim();
 
   conCarga_(btn, 'Guardando...', llamar('crearTarea', [{
-    texto: texto, maquina: maquina, tipo: estado.tarTipoSel,
+    texto: texto, maquina: maquina, categoria: estado.tarCategoriaSel,
     foto: estado.tarFotoDataUrl, yaHecha: estado.tarHechaSel, quien: ''
   }])).then(function () {
     mostrarToast(estado.tarHechaSel ? 'Cargado como hecho ✓' : 'Tarea creada ✓');
     volverTarPaso1();
     cargarTareas();
   }).catch(function (e) { mostrarToast('Error: ' + e.message); });
+}
+
+function toggleGrupo(clave) {
+  estado.gruposAbiertos[clave] = !estado.gruposAbiertos[clave];
+  document.getElementById('lista' + (clave === 'Pend' ? 'TareasPend' : 'TareasHechas'))
+    .classList.toggle('oculto', !estado.gruposAbiertos[clave]);
+  document.getElementById('tit' + (clave === 'Pend' ? 'Pend' : 'Hechas'))
+    .classList.toggle('colapsado', !estado.gruposAbiertos[clave]);
 }
 
 function cargarTareas() {
@@ -571,6 +616,11 @@ function cargarTareas() {
     document.getElementById('contTareas').textContent = pend.length
       ? pend.length + ' pendiente' + (pend.length === 1 ? '' : 's')
       : 'a hacer y hechas';
+
+    document.getElementById('numPend').textContent = pend.length;
+    document.getElementById('txtPend').textContent = pend.length === 1 ? 'PENDIENTE' : 'PENDIENTES';
+    document.getElementById('numHechas').textContent = hechas.length;
+    document.getElementById('txtHechas').textContent = hechas.length === 1 ? 'COMPLETADA' : 'COMPLETADAS';
 
     var contP = document.getElementById('listaTareasPend');
     contP.innerHTML = pend.length ? '' : '<p style="color:var(--muted);font-size:14px;">Sin pendientes.</p>';
@@ -589,16 +639,18 @@ function renderTarea_(t, hecha) {
   var check = document.createElement('div');
   check.className = 'check';
   check.title = hecha ? 'Reabrir' : 'Marcar como hecha';
+  check.textContent = hecha ? '✓' : '';
   check.onclick = function () {
     if (hecha) { reabrirTareaUI(t.id); } else { marcarHechaUI(t.id); }
   };
 
+  var categoria = t.categoria || 'Otros';
   var cont = document.createElement('div');
   cont.className = 'cont';
-  var etiqueta = [t.maquina, t.tipo].filter(Boolean).join(' — ');
   cont.innerHTML =
-    (etiqueta ? '<div class="meta" style="font-weight:700;">' + escHtml_(etiqueta) + '</div>' : '') +
+    '<span class="cat-pill ' + claseCategoria_(categoria) + '">' + escHtml_(categoria) + '</span>' +
     '<div class="txt">' + escHtml_(t.texto) + '</div>' +
+    (t.maquina ? '<div class="meta">' + escHtml_(t.maquina) + '</div>' : '') +
     '<div class="meta">' + (hecha
       ? 'Hecha' + (t.hechaPor ? ' por ' + escHtml_(t.hechaPor) : '') + ' · ' + fFecha_(t.hechaEl)
       : 'Creada · ' + fFecha_(t.creadaEl)) + '</div>' +
