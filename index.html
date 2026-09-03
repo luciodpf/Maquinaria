@@ -183,10 +183,11 @@
     <button class="volver" onclick="ir('home')">‹ Volver</button>
 
     <label class="btn-foto" id="remBtnFoto">
-      📷 Tocá para sacar o elegir la foto del remito
-      <input type="file" id="remInput" accept="image/*" capture="environment" onchange="remFotoElegida(event)">
+      📷 Tocá para sacar una foto, elegir de la galería, o un PDF
+      <input type="file" id="remInput" accept="image/*,application/pdf" onchange="remFotoElegida(event)">
     </label>
     <img id="remPreview" class="preview">
+    <div id="remPreviewPdf" class="oculto" style="text-align:center;font-weight:700;color:var(--accent);margin-bottom:12px;">📄 PDF elegido</div>
 
     <div id="remLeyendo" class="oculto" style="text-align:center;color:var(--muted);font-weight:700;margin-bottom:16px;">
       🔎 Leyendo el remito...
@@ -262,7 +263,7 @@
 
       <label class="btn-foto" id="tarBtnFoto">
         📷 Agregar foto (opcional)
-        <input type="file" id="tarInput" accept="image/*" capture="environment" onchange="tarFotoElegida(event)">
+        <input type="file" id="tarInput" accept="image/*" onchange="tarFotoElegida(event)">
       </label>
       <img id="tarPreview" class="preview">
 
@@ -477,11 +478,24 @@ function cargarCombustible() {
 function remFotoElegida(ev) {
   var file = ev.target.files[0];
   if (!file) return;
-  comprimirImagen_(file, function (dataUrl) {
+  var esPdf = file.type === 'application/pdf';
+
+  // Un PDF no pasa por el canvas de compresión (es para imágenes, rompería
+  // con un PDF) — se manda tal cual, en base64.
+  var listo = esPdf ? leerArchivoDataUrl_ : comprimirImagen_;
+
+  listo(file, function (dataUrl) {
     estado.remFotoDataUrl = dataUrl;
     var img = document.getElementById('remPreview');
-    img.src = dataUrl;
-    img.style.display = 'block';
+    var tagPdf = document.getElementById('remPreviewPdf');
+    if (esPdf) {
+      img.style.display = 'none';
+      tagPdf.classList.remove('oculto');
+    } else {
+      img.src = dataUrl;
+      img.style.display = 'block';
+      tagPdf.classList.add('oculto');
+    }
 
     // Fecha de hoy como default, por si la lectura automática falla o no la trae.
     document.getElementById('remFecha').value = new Date().toISOString().slice(0, 10);
@@ -522,6 +536,7 @@ function guardarRemitoUI(btn) {
     mostrarToast('Remito subido ✓');
     estado.remFotoDataUrl = '';
     document.getElementById('remPreview').style.display = 'none';
+    document.getElementById('remPreviewPdf').classList.add('oculto');
     document.getElementById('remCampos').classList.add('oculto');
     document.getElementById('remFecha').value = '';
     document.getElementById('remProveedor').value = '';
@@ -544,7 +559,8 @@ function cargarRemitos() {
         '<div class="titulo">' + escHtml_(rem.proveedor || 'Sin proveedor') +
           (rem.monto ? ' — $' + rem.monto : '') + '</div>' +
         (rem.descripcion ? '<div class="desc">' + escHtml_(rem.descripcion) + '</div>' : '') +
-        (rem.foto ? '<img src="' + rem.foto + '">' : '');
+        (rem.foto ? '<img src="' + rem.foto + '" onerror="this.style.display=\'none\'">' : '') +
+        (rem.fotoVer ? '<a href="' + rem.fotoVer + '" target="_blank" style="display:block;margin-top:6px;font-size:13px;font-weight:700;color:var(--accent2);">📎 Ver archivo completo</a>' : '');
 
       var borrar = document.createElement('button');
       borrar.className = 'btn chico fantasma';
@@ -785,6 +801,13 @@ function comprimirImagen_(file, cb) {
     };
     img.src = e.target.result;
   };
+  reader.readAsDataURL(file);
+}
+
+/** Para archivos que no son imagen (PDF): se manda tal cual, sin pasar por el canvas. */
+function leerArchivoDataUrl_(file, cb) {
+  var reader = new FileReader();
+  reader.onload = function (e) { cb(e.target.result); };
   reader.readAsDataURL(file);
 }
 
