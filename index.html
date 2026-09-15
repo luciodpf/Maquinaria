@@ -136,8 +136,6 @@
   table.planilla tr:not(.abierta) .det{white-space:nowrap;
     overflow:hidden;text-overflow:ellipsis;}
   table.planilla tr:not(.abierta) .prov{overflow:hidden;text-overflow:ellipsis;}
-  table.planilla tfoot td{border-top:2px solid var(--borde);font-weight:700;
-    background:#f2f1ea;}
   .planResumen{font-size:13px;color:var(--muted);margin-bottom:10px;}
   .planPie{font-size:12px;color:var(--muted);margin-top:10px;text-align:center;}
 
@@ -258,7 +256,6 @@
           <tr><th>Fecha</th><th>Proveedor</th><th class="num">Monto</th><th>Detalle</th></tr>
         </thead>
         <tbody id="planCuerpo"></tbody>
-        <tfoot id="planPieTabla"></tfoot>
       </table>
     </div>
 
@@ -629,10 +626,8 @@ var PLANILLA_MAX = 300;
 
 function cargarPlanilla() {
   var cuerpo = document.getElementById('planCuerpo');
-  var pie = document.getElementById('planPieTabla');
   var resumen = document.getElementById('planResumen');
   cuerpo.innerHTML = '';
-  pie.innerHTML = '';
   resumen.textContent = 'Cargando...';
 
   llamar('getRemitos', [PLANILLA_MAX]).then(function (r) {
@@ -642,11 +637,7 @@ function cargarPlanilla() {
       return;
     }
 
-    var total = 0;
     remitos.forEach(function (rem) {
-      var monto = Number(rem.monto);
-      if (!isNaN(monto)) total += monto;
-
       var tr = document.createElement('tr');
       tr.innerHTML =
         '<td class="fecha">' + fFecha_(rem.fecha) + '</td>' +
@@ -656,9 +647,6 @@ function cargarPlanilla() {
       tr.onclick = function () { tr.classList.toggle('abierta'); };
       cuerpo.appendChild(tr);
     });
-
-    pie.innerHTML = '<tr><td colspan="2">Total</td>' +
-      '<td class="num">' + fPlata_(total) + '</td><td></td></tr>';
 
     resumen.textContent = remitos.length + (remitos.length === 1 ? ' remito' : ' remitos') +
       ', del más nuevo al más viejo.';
