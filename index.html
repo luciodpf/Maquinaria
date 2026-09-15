@@ -119,6 +119,28 @@
     border-radius:14px;padding:16px;text-align:center;font-weight:700;margin-bottom:16px;
     font-size:14px;}
 
+  /* planilla de remitos: filas tipo Excel, sin fotos */
+  .tablaWrap{overflow-x:auto;-webkit-overflow-scrolling:touch;background:var(--panel);
+    border:1px solid var(--borde);border-radius:12px;}
+  table.planilla{border-collapse:collapse;width:100%;font-size:13px;table-layout:fixed;}
+  table.planilla th{background:var(--accent);color:#fff;font-size:10px;font-weight:700;
+    text-transform:uppercase;letter-spacing:.03em;padding:9px 8px;text-align:left;
+    white-space:nowrap;}
+  table.planilla td{padding:9px 8px;border-top:1px solid var(--borde);vertical-align:top;}
+  table.planilla tbody tr:nth-child(even){background:#faf9f4;}
+  table.planilla .fecha{white-space:nowrap;color:var(--muted);}
+  table.planilla .prov{font-weight:700;}
+  table.planilla .num{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums;}
+  table.planilla .det{color:#444;}
+  /* el detalle suele ser largo: una linea, y la fila se abre al tocarla */
+  table.planilla tr:not(.abierta) .det{white-space:nowrap;
+    overflow:hidden;text-overflow:ellipsis;}
+  table.planilla tr:not(.abierta) .prov{overflow:hidden;text-overflow:ellipsis;}
+  table.planilla tfoot td{border-top:2px solid var(--borde);font-weight:700;
+    background:#f2f1ea;}
+  .planResumen{font-size:13px;color:var(--muted);margin-bottom:10px;}
+  .planPie{font-size:12px;color:var(--muted);margin-top:10px;text-align:center;}
+
   .toast{position:fixed;left:16px;right:16px;bottom:20px;max-width:520px;margin:0 auto;
     background:var(--ink);color:#fff;padding:14px 18px;border-radius:12px;
     font-size:14px;text-align:center;z-index:50;box-shadow:0 4px 16px rgba(0,0,0,.2);}
@@ -214,8 +236,33 @@
       <button class="btn grande" onclick="guardarRemitoUI(this)">Subir remito</button>
     </div>
 
+    <button class="btn secundario" onclick="ir('planilla')">📋 Ver todos en planilla</button>
+
     <div class="seccion-tit">Últimos remitos</div>
     <div class="lista" id="listaRemitos"></div>
+  </section>
+
+  <!-- ===================== PLANILLA DE REMITOS ===================== -->
+  <section id="vPlanilla" class="oculto">
+    <button class="volver" onclick="ir('remitos')">‹ Volver a remitos</button>
+
+    <div class="seccion-tit">Planilla de remitos</div>
+    <div class="planResumen" id="planResumen">Cargando...</div>
+
+    <div class="tablaWrap">
+      <table class="planilla">
+        <colgroup>
+          <col style="width:58px"><col style="width:33%"><col style="width:78px"><col>
+        </colgroup>
+        <thead>
+          <tr><th>Fecha</th><th>Proveedor</th><th class="num">Monto</th><th>Detalle</th></tr>
+        </thead>
+        <tbody id="planCuerpo"></tbody>
+        <tfoot id="planPieTabla"></tfoot>
+      </table>
+    </div>
+
+    <div class="planPie">Tocá una fila para ver el detalle completo.</div>
   </section>
 
   <!-- ===================== TAREAS ===================== -->
@@ -329,7 +376,7 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 /* ====================== NAVEGACIÓN ====================== */
-var VISTAS = ['home', 'combustible', 'remitos', 'tareas'];
+var VISTAS = ['home', 'combustible', 'remitos', 'tareas', 'planilla'];
 
 function ir(vista) {
   VISTAS.forEach(function (v) {
@@ -339,6 +386,7 @@ function ir(vista) {
 
   if (vista === 'combustible') { volverCombPaso1(); cargarCombustible(); }
   if (vista === 'remitos') { cargarRemitos(); }
+  if (vista === 'planilla') { cargarPlanilla(); }
   if (vista === 'tareas') { volverTarPaso1(); cargarTareas(); }
 }
 
@@ -572,6 +620,51 @@ function cargarRemitos() {
       cont.appendChild(div);
     });
   }).catch(function () {});
+}
+
+/* La planilla muestra lo leido del remito (fecha, proveedor, monto, items) sin
+   las fotos: es para repasar todo junto, como las filas de un Excel. La lista
+   de arriba sigue mostrando los ultimos 10 con imagen. */
+var PLANILLA_MAX = 300;
+
+function cargarPlanilla() {
+  var cuerpo = document.getElementById('planCuerpo');
+  var pie = document.getElementById('planPieTabla');
+  var resumen = document.getElementById('planResumen');
+  cuerpo.innerHTML = '';
+  pie.innerHTML = '';
+  resumen.textContent = 'Cargando...';
+
+  llamar('getRemitos', [PLANILLA_MAX]).then(function (r) {
+    var remitos = r || [];
+    if (!remitos.length) {
+      resumen.textContent = 'Todavía no hay remitos cargados.';
+      return;
+    }
+
+    var total = 0;
+    remitos.forEach(function (rem) {
+      var monto = Number(rem.monto);
+      if (!isNaN(monto)) total += monto;
+
+      var tr = document.createElement('tr');
+      tr.innerHTML =
+        '<td class="fecha">' + fFecha_(rem.fecha) + '</td>' +
+        '<td class="prov">' + escHtml_(rem.proveedor || '—') + '</td>' +
+        '<td class="num">' + (rem.monto ? fPlata_(rem.monto) : '—') + '</td>' +
+        '<td class="det">' + escHtml_(rem.descripcion || '') + '</td>';
+      tr.onclick = function () { tr.classList.toggle('abierta'); };
+      cuerpo.appendChild(tr);
+    });
+
+    pie.innerHTML = '<tr><td colspan="2">Total</td>' +
+      '<td class="num">' + fPlata_(total) + '</td><td></td></tr>';
+
+    resumen.textContent = remitos.length + (remitos.length === 1 ? ' remito' : ' remitos') +
+      ', del más nuevo al más viejo.';
+  }).catch(function (e) {
+    resumen.textContent = 'No se pudo traer la planilla: ' + e.message;
+  });
 }
 
 function borrarRemitoUI(id) {
@@ -816,6 +909,12 @@ function fFecha_(iso) {
   var p = iso.split('-');
   if (p.length !== 3) return iso;
   return p[2] + '/' + p[1] + '/' + p[0].slice(2);
+}
+
+function fPlata_(n) {
+  var v = Number(n);
+  if (isNaN(v)) return String(n || '');
+  return '$' + v.toLocaleString('es-AR', { maximumFractionDigits: 0 });
 }
 
 function escHtml_(s) {
