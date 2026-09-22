@@ -121,6 +121,42 @@
     border-radius:14px;padding:16px;text-align:center;font-weight:700;margin-bottom:16px;
     font-size:14px;}
 
+  /* fumigación */
+  .fumStats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;}
+  .fumStats.dos{grid-template-columns:1fr 1fr;}
+  .fumStat{background:var(--panel);border:1px solid var(--borde);border-radius:12px;
+    padding:10px 6px;text-align:center;}
+  .fumStat b{display:block;font-size:19px;font-weight:700;}
+  .fumStat span{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;}
+  .fumOps{background:var(--panel);border:1px solid var(--borde);border-radius:12px;
+    padding:10px 14px;margin-bottom:12px;}
+  .fumOps .tit{font-size:11px;color:var(--muted);text-transform:uppercase;
+    letter-spacing:.04em;font-weight:700;margin-bottom:6px;}
+  .fumOps .fila{display:flex;justify-content:space-between;font-size:13px;padding:3px 0;}
+  .fumOps .fila b{font-weight:600;}
+  .fumCampos{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+  .fumCampo{background:var(--panel);border:1px solid var(--borde);border-radius:12px;
+    padding:14px 10px;text-align:center;}
+  .fumCampo b{display:block;font-size:15px;font-weight:700;text-transform:capitalize;}
+  .fumCampo span{font-size:11px;color:var(--muted);}
+  .fumDet{display:none;border-top:1px solid var(--borde);margin-top:10px;padding-top:8px;}
+  .item.abierta .fumDet{display:block;}
+  .fumProd{display:flex;justify-content:space-between;align-items:center;gap:10px;
+    font-size:14px;padding:7px 0;border-bottom:1px solid var(--borde);}
+  .fumProd:last-child{border-bottom:none;}
+  .fumProd .cant{color:var(--muted);white-space:nowrap;}
+  .fumEditor{display:flex;gap:6px;margin:8px 0;}
+  .fumEditor input{flex:1;min-width:0;padding:9px;border:1px solid var(--borde);
+    border-radius:8px;font-size:15px;background:#fff;}
+  .fumEditor .ok,.fumEditor .no{border:none;border-radius:8px;padding:0 13px;font-size:15px;color:#fff;}
+  .fumEditor .ok{background:var(--verde);}
+  .fumEditor .no{background:#b5b0a4;}
+  .fumOk{text-align:center;color:var(--verde);font-size:12px;font-weight:700;padding:6px 0;}
+  .fumProdNuevo{display:flex;gap:6px;margin-bottom:8px;}
+  .fumProdNuevo input{flex:1;min-width:0;padding:12px;border:1px solid var(--borde);
+    border-radius:10px;font-size:16px;background:#fff;}
+  .fumProdNuevo button{border:none;background:#b5b0a4;color:#fff;border-radius:10px;padding:0 14px;}
+
   /* camion */
   .camBarra{display:flex;align-items:center;justify-content:space-between;gap:10px;
     background:var(--panel);border:1px solid var(--borde);border-radius:12px;
@@ -187,6 +223,9 @@
       </div>
       <div class="tarjeta" data-vista="camion" onclick="ir('camion')">
         <div class="ico">🚛</div>Camión<small>viajes, gasoil, service</small>
+      </div>
+      <div class="tarjeta" data-vista="fumigacion" onclick="ir('fumigacion')">
+        <div class="ico">🌱</div>Fumigación<small>aplicaciones por lote</small>
       </div>
       <div class="tarjeta" data-vista="combustible" onclick="ir('combustible')">
         <div class="ico">⛽</div>Combustible<small>cargar o llegada al galpón</small>
@@ -286,6 +325,66 @@
     </div>
 
     <div class="planPie">Tocá una fila para ver el detalle completo.</div>
+  </section>
+
+  <!-- ===================== FUMIGACIÓN =====================
+       Igual que Camión: su propia planilla y su propio Apps Script, los
+       mismos que usa la app suelta de Lalo (luciodpf.github.io/Aplicaciones).
+       Las filas las escribe el pipeline que lee los Excel de recetas; acá se
+       corrigen y se agregan trabajos a mano. -->
+  <section id="vFumigacion" class="oculto">
+
+    <div id="fumPaso1">
+      <button class="volver" onclick="ir('home')">‹ Volver</button>
+
+      <div class="filtros" id="fumTabs">
+        <button class="chip sel" id="fumTabMes" onclick="fumVerTab('mes')">Este mes</button>
+        <button class="chip" id="fumTabCampo" onclick="fumVerTab('campo')">Por campo</button>
+        <button class="chip" onclick="fumCargar()">↻</button>
+      </div>
+
+      <div class="chips" id="fumChipsZona" style="margin-bottom:12px"></div>
+
+      <div id="fumContenido"></div>
+
+      <button class="btn grande verde" onclick="fumNuevoTrabajo()">+ Nuevo trabajo</button>
+    </div>
+
+    <div id="fumPaso2" class="oculto">
+      <button class="volver" onclick="fumVolverLista()">‹ Volver</button>
+      <p style="font-weight:700;font-size:16px;">Nuevo trabajo</p>
+
+      <div class="campo">
+        <label>Campo</label>
+        <select id="fumNtCampo"></select>
+      </div>
+      <div class="campo chico">
+        <label>Lote</label>
+        <input type="text" id="fumNtLote" placeholder="1">
+      </div>
+      <div class="campo chico">
+        <label>Fecha</label>
+        <input type="date" id="fumNtFecha">
+      </div>
+      <div class="campo chico">
+        <label>Hectáreas</label>
+        <input type="text" id="fumNtSuperficie" inputmode="decimal" placeholder="0">
+      </div>
+
+      <div class="campo">
+        <label>Productos</label>
+        <div id="fumNtProductos"></div>
+        <button class="btn chico fantasma" onclick="fumNtAgregarFila()">+ Agregar otro producto</button>
+      </div>
+
+      <div class="campo">
+        <label>¿Quién fumigó? <span class="opt">— opcional, se puede cargar después</span></label>
+        <div class="chips" id="fumNtOperadores"></div>
+      </div>
+
+      <button class="btn grande" id="fumNtGuardar" onclick="fumGuardarTrabajo()">Guardar trabajo</button>
+    </div>
+
   </section>
 
   <!-- ===================== CAMIÓN =====================
@@ -508,9 +607,13 @@ var GANADERIA_BACKEND = 'https://script.google.com/macros/s/AKfycby0vYipnm6pAt5E
 
 /* ====================== QUIÉN ESTÁ USANDO ======================
  *
- * Sin contraseña: a cada uno se le manda su propio link (…/?u=pato) y el
+ * Sin contraseña: a cada uno se le manda su propio link (…/?u=jkzw4k3) y el
  * teléfono se lo acuerda. Hace falta guardarlo la primera vez porque al
  * instalar la app Chrome abre el start_url del manifest y se come el ?u=.
+ *
+ * El token es para que no se adivine tipeando el nombre de otro, no para
+ * esconderlo: esta lista está a la vista en el código, que es un repo
+ * público. Como no habilita nada, da igual.
  *
  * Esto NO esconde nada: solo cambia el orden de los cuadrados del inicio,
  * para que cada uno tenga arriba lo que usa todos los días. Si alguien entra
@@ -518,15 +621,15 @@ var GANADERIA_BACKEND = 'https://script.google.com/macros/s/AKfycby0vYipnm6pAt5E
  * de verdad, va PIN como en Ganadería.
  */
 var PERSONAS = {
-  pato:   { nombre:'Pato',   orden:['camion', 'remitos'] },
-  lalo:   { nombre:'Lalo',   orden:['fumigacion'] },
-  lucio:  { nombre:'Lucio',  orden:[] },
-  daniel: { nombre:'Daniel', orden:[] }
+  'jkzw4k3': { nombre:'Pato',   orden:['camion', 'remitos'] },
+  't46cbl2': { nombre:'Lalo',   orden:['fumigacion'] },
+  'cmf8i6a': { nombre:'Lucio',  orden:[] },
+  'bcuiltt': { nombre:'Daniel', orden:[] }
 };
 
 /* Todos los cuadrados, en el orden de fábrica. Si se agrega uno nuevo, va acá
    también, si no queda antes de los ordenados. */
-var ORDEN_BASE = ['remitos', 'tareas', 'camion', 'combustible'];
+var ORDEN_BASE = ['remitos', 'tareas', 'camion', 'fumigacion', 'combustible'];
 
 function quienEs_() {
   var u = '';
@@ -579,7 +682,7 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 /* ====================== NAVEGACIÓN ====================== */
-var VISTAS = ['home', 'combustible', 'remitos', 'tareas', 'planilla', 'camion'];
+var VISTAS = ['home', 'combustible', 'remitos', 'tareas', 'planilla', 'camion', 'fumigacion'];
 
 function ir(vista) {
   VISTAS.forEach(function (v) {
@@ -592,6 +695,7 @@ function ir(vista) {
   if (vista === 'planilla') { cargarPlanilla(); }
   if (vista === 'tareas') { volverTarPaso1(); cargarTareas(); }
   if (vista === 'camion') { camVolverLista(); camCargar(); }
+  if (vista === 'fumigacion') { fumVolverLista(); fumCargar(); }
 }
 
 function capitaliza_(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
@@ -1065,6 +1169,533 @@ function borrarTareaUI(id) {
     mostrarToast('Borrada ✓');
     cargarTareas();
   }).catch(function (e) { mostrarToast('Error: ' + e.message); });
+}
+
+/* ====================== FUMIGACIÓN ======================
+ *
+ * Portado del repo luciodpf/Aplicaciones (app.html). Como Camión, habla con
+ * su propia planilla y su propio Apps Script, no con el backend de
+ * Maquinaria, así que la app suelta de Lalo sigue funcionando igual.
+ *
+ * Las filas las carga sola el pipeline que lee los Excel de recetas con la
+ * API; desde acá se corrigen (producto, cantidad, fecha, quién fumigó) y se
+ * agregan trabajos que no vinieron en ningún Excel.
+ *
+ * Acá el write va por POST con text/plain: es "simple request", no dispara
+ * el pedido de permiso que Apps Script no contesta, y el cuerpo llega igual.
+ * (Camión usa doGet con ?data= porque se armó al revés; cada una se deja
+ * como está, que es como funciona hoy en producción.)
+ */
+var FUM_SHEET  = '1jfk3SU0AR4aT9po5DtSv4_-GUs9vFnUHGKkBZtdMwqw';
+var FUM_HOJA   = 'Aplicaciones';
+var FUM_SCRIPT = 'https://script.google.com/macros/s/AKfycbyFgPZi5myG0EfFV4o56WOw5ljewgNNdXHrJBJQJOuwGJOg5ZYitHiIzcCceFTql405Sg/exec';
+
+var FUM_NORTE = ['salera', 'mondino', 'bertolini', 'cibalero', 'gazano'];
+var FUM_MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio',
+                 'Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+var FUM_MESES_CORTO = ['ENE','FEB','MAR','ABR','MAY','JUN','JUL','AGO','SEP','OCT','NOV','DIC'];
+var FUM_OPERADORES = [
+  { valor:'Solo',        label:'Solo',        largo:'Lalo solo' },
+  { valor:'+Pato',       label:'+ Pato',      largo:'Con Pato' },
+  { valor:'+Mauri',      label:'+ Mauri',     largo:'Con Mauri' },
+  { valor:'+Robertito',  label:'+ Robertito', largo:'Con Robertito' },
+  { valor:'Terceros',    label:'Terceros',    largo:'Terceros' }
+];
+
+var fumDatos = [], fumTab = 'mes', fumZona = 'todas', fumCampoSel = null;
+var fumMes = new Date().getMonth(), fumAnio = new Date().getFullYear();
+var fumOperadorNuevo = '';
+
+/* ---------- traer ---------- */
+function fumCargar() {
+  var cont = document.getElementById('fumContenido');
+  cont.innerHTML = '<div class="item">Cargando...</div>';
+  var url = 'https://docs.google.com/spreadsheets/d/' + FUM_SHEET +
+            '/gviz/tq?tqx=out:csv&sheet=' + encodeURIComponent(FUM_HOJA) + '&t=' + Date.now();
+  fetch(url)
+    .then(function (r) { return r.text(); })
+    .then(function (csv) { fumDatos = fumParsear(csv); fumPintarZonas(); fumPintar(); })
+    .catch(function () {
+      cont.innerHTML = '<div class="item">No se pudo traer la planilla de aplicaciones.</div>';
+    });
+}
+
+function fumZonaDe_(campo) {
+  return FUM_NORTE.indexOf(String(campo || '').toLowerCase()) >= 0 ? 'Norte' : 'Sur';
+}
+
+function fumParsear(csv) {
+  var lineas = csv.trim().split('\n');
+  var out = [];
+  for (var i = 1; i < lineas.length; i++) {
+    var c = fumParsearLinea(lineas[i]);
+    if (c.length < 8) continue;
+    var limpio = function (x) { return (x || '').replace(/"/g, '').trim(); };
+    var num = function (x) { return parseFloat(limpio(x).replace(',', '.')) || 0; };
+    var fechaStr = limpio(c[0]);
+    var fecha = fumFecha_(fechaStr);
+    if (!fecha) continue;
+    var campo = limpio(c[2]);
+    out.push({
+      fecha: fecha, fechaStr: fechaStr, campo: campo, lote: limpio(c[3]),
+      zona: limpio(c[4]) || fumZonaDe_(campo),
+      superficie: num(c[6]), insumo: limpio(c[7]), cantidad: num(c[9]),
+      id: limpio(c[14]), operador: limpio(c[15]),
+      // fila real de la planilla: la 1 es el encabezado. Se usa para corregir
+      // un producto sin tocar el resto, así que no se puede recalcular.
+      fila: i + 1
+    });
+  }
+  return out;
+}
+
+function fumParsearLinea(linea) {
+  var r = [], cur = '', enComillas = false;
+  for (var i = 0; i < linea.length; i++) {
+    var ch = linea[i];
+    if (ch === '"') enComillas = !enComillas;
+    else if (ch === ',' && !enComillas) { r.push(cur); cur = ''; }
+    else cur += ch;
+  }
+  r.push(cur);
+  return r;
+}
+
+function fumFecha_(str) {
+  if (!str) return null;
+  var p = String(str).split('/');
+  if (p.length !== 3) return null;
+  var a = p[2].length === 2 ? '20' + p[2] : p[2];
+  var d = new Date(parseInt(a, 10), parseInt(p[1], 10) - 1, parseInt(p[0], 10));
+  return isNaN(d.getTime()) ? null : d;
+}
+
+function fumAttr_(x) {
+  return String(x === null || x === undefined ? '' : x)
+    .replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+/** Una aplicación = fecha + campo + lote. Los productos son sus filas. */
+function fumAgrupar(filas) {
+  var mapa = {}, orden = [];
+  filas.forEach(function (r) {
+    var k = r.fechaStr + '||' + r.campo + '||' + r.lote;
+    if (!mapa[k]) {
+      mapa[k] = { fecha:r.fecha, fechaStr:r.fechaStr, campo:r.campo, lote:r.lote,
+                  zona:r.zona, superficie:r.superficie, id:r.id,
+                  operador:r.operador || '', productos:[] };
+      orden.push(k);
+    }
+    if (r.insumo) mapa[k].productos.push({ nombre:r.insumo, cantidad:r.cantidad, fila:r.fila });
+  });
+  return orden.map(function (k) { return mapa[k]; })
+              .sort(function (a, b) { return b.fecha - a.fecha; });
+}
+
+/* ---------- filtros ---------- */
+function fumVerTab(t) {
+  fumTab = t;
+  fumCampoSel = null;
+  document.getElementById('fumTabMes').className = 'chip' + (t === 'mes' ? ' sel' : '');
+  document.getElementById('fumTabCampo').className = 'chip' + (t === 'campo' ? ' sel' : '');
+  fumPintar();
+}
+
+function fumPintarZonas() {
+  var c = document.getElementById('fumChipsZona');
+  c.innerHTML = '';
+  ['todas', 'Sur', 'Norte'].forEach(function (z) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'chip' + (z === fumZona ? ' sel' : '');
+    b.textContent = z === 'todas' ? 'Todas' : z;
+    b.onclick = function () { fumZona = z; fumCampoSel = null; fumPintarZonas(); fumPintar(); };
+    c.appendChild(b);
+  });
+}
+
+function fumCambiarMes(d) {
+  fumMes += d;
+  if (fumMes > 11) { fumMes = 0; fumAnio++; }
+  if (fumMes < 0) { fumMes = 11; fumAnio--; }
+  fumPintar();
+}
+
+function fumDeZona_(filas) {
+  return fumZona === 'todas' ? filas : filas.filter(function (r) { return r.zona === fumZona; });
+}
+
+/* ---------- pintar ---------- */
+function fumPintar() {
+  if (fumTab === 'mes') fumPintarMes();
+  else fumPintarCampos();
+}
+
+function fumPintarMes() {
+  var filas = fumDeZona_(fumDatos).filter(function (r) {
+    return r.fecha.getMonth() === fumMes && r.fecha.getFullYear() === fumAnio;
+  });
+  var grupos = fumAgrupar(filas);
+
+  var has = 0, campos = {};
+  grupos.forEach(function (g) { has += g.superficie; campos[g.campo] = 1; });
+
+  var html =
+    '<div class="camBarra">' +
+      '<div class="camMes">' +
+        '<button class="camMesBtn" onclick="fumCambiarMes(-1)">‹</button>' +
+        '<span>' + FUM_MESES[fumMes] + ' ' + fumAnio + '</span>' +
+        '<button class="camMesBtn" onclick="fumCambiarMes(1)">›</button>' +
+      '</div>' +
+    '</div>' +
+    '<div class="fumStats">' +
+      '<div class="fumStat"><b>' + has.toLocaleString('es-AR', { maximumFractionDigits:0 }) + '</b><span>Hectáreas</span></div>' +
+      '<div class="fumStat"><b>' + grupos.length + '</b><span>Aplicaciones</span></div>' +
+      '<div class="fumStat"><b>' + Object.keys(campos).length + '</b><span>Campos</span></div>' +
+    '</div>' +
+    fumStatsOperadores(grupos);
+
+  if (!grupos.length) {
+    html += '<div class="item">No hay aplicaciones en ' + FUM_MESES[fumMes] + ' ' + fumAnio + '.</div>';
+  } else {
+    var dia = '';
+    grupos.forEach(function (g) {
+      var etiqueta = g.fecha.getDate() + ' de ' + FUM_MESES[g.fecha.getMonth()];
+      if (etiqueta !== dia) { dia = etiqueta; html += '<div class="camDia">' + etiqueta + '</div>'; }
+      html += fumTarjeta(g);
+    });
+  }
+  document.getElementById('fumContenido').innerHTML = html;
+}
+
+function fumPintarCampos() {
+  var filas = fumDeZona_(fumDatos);
+
+  if (!fumCampoSel) {
+    var nombres = [], visto = {};
+    filas.forEach(function (r) { if (r.campo && !visto[r.campo]) { visto[r.campo] = 1; nombres.push(r.campo); } });
+    nombres.sort();
+    var h = '<div class="fumCampos">';
+    nombres.forEach(function (n) {
+      var cuantas = fumAgrupar(filas.filter(function (r) { return r.campo === n; })).length;
+      h += '<div class="fumCampo" onclick="fumElegirCampo(\'' + fumAttr_(n) + '\')">' +
+             '<b>' + escHtml_(n) + '</b><span>' + cuantas + ' aplic.</span></div>';
+    });
+    h += '</div>';
+    document.getElementById('fumContenido').innerHTML = h;
+    return;
+  }
+
+  var grupos = fumAgrupar(filas.filter(function (r) { return r.campo === fumCampoSel; }));
+  var has = 0;
+  grupos.forEach(function (g) { has += g.superficie; });
+
+  var html =
+    '<button class="volver" onclick="fumElegirCampo(null)">‹ Todos los campos</button>' +
+    '<div class="seccion-tit">' + escHtml_(fumCampoSel) + '</div>' +
+    '<div class="fumStats dos">' +
+      '<div class="fumStat"><b>' + has.toLocaleString('es-AR', { maximumFractionDigits:0 }) + '</b><span>Has. totales</span></div>' +
+      '<div class="fumStat"><b>' + grupos.length + '</b><span>Aplicaciones</span></div>' +
+    '</div>';
+
+  var mes = '';
+  grupos.forEach(function (g) {
+    var etiqueta = FUM_MESES[g.fecha.getMonth()] + ' ' + g.fecha.getFullYear();
+    if (etiqueta !== mes) { mes = etiqueta; html += '<div class="camDia">' + etiqueta + '</div>'; }
+    html += fumTarjeta(g);
+  });
+  document.getElementById('fumContenido').innerHTML = html;
+}
+
+function fumElegirCampo(n) { fumCampoSel = n; fumPintar(); }
+
+function fumStatsOperadores(grupos) {
+  var acum = { 'Sin cargar': 0 };
+  FUM_OPERADORES.forEach(function (o) { acum[o.valor] = 0; });
+  grupos.forEach(function (g) {
+    var k = g.operador && acum.hasOwnProperty(g.operador) ? g.operador : 'Sin cargar';
+    acum[k] += g.superficie;
+  });
+
+  var filas = '', hayAlguno = false;
+  FUM_OPERADORES.forEach(function (o) {
+    if (acum[o.valor] > 0) {
+      hayAlguno = true;
+      filas += '<div class="fila"><span>' + o.largo + '</span><b>' +
+               acum[o.valor].toLocaleString('es-AR') + ' has</b></div>';
+    }
+  });
+  if (acum['Sin cargar'] > 0) {
+    filas += '<div class="fila" style="color:var(--muted)"><span>Sin cargar</span><b>' +
+             acum['Sin cargar'].toLocaleString('es-AR') + ' has</b></div>';
+  }
+
+  if (!hayAlguno && acum['Sin cargar'] === 0) return '';
+  return '<div class="fumOps"><div class="tit">¿Quién fumigó?</div>' +
+         (hayAlguno ? filas : filas + '<div class="fila" style="color:var(--muted)"><span>Todavía no hay operadores cargados</span></div>') +
+         '</div>';
+}
+
+function fumTarjeta(g) {
+  var dia = String(g.fecha.getDate()).padStart(2, '0') + ' ' + FUM_MESES_CORTO[g.fecha.getMonth()];
+  var lote = (g.lote && g.lote !== '1') ? ' · Lote ' + escHtml_(g.lote) : '';
+  var n = g.productos.length;
+
+  var productos = g.productos.map(function (p) {
+    return '<div class="fumProd" data-fila="' + fumAttr_(p.fila) + '" data-id="' + fumAttr_(g.id) + '" ' +
+             'data-nombre="' + fumAttr_(p.nombre) + '" data-cantidad="' + fumAttr_(p.cantidad || 0) + '" ' +
+             'onclick="fumEditarProducto(this)">' +
+             '<span>' + escHtml_(p.nombre) + '</span>' +
+             '<span class="cant">' + (p.cantidad > 0 ? p.cantidad.toLocaleString('es-AR') : '') + ' ✎</span>' +
+           '</div>';
+  }).join('');
+
+  var iso = g.fecha.getFullYear() + '-' +
+            String(g.fecha.getMonth() + 1).padStart(2, '0') + '-' +
+            String(g.fecha.getDate()).padStart(2, '0');
+
+  var acciones = '';
+  if (g.id) {
+    acciones =
+      '<button class="btn chico fantasma" style="margin-top:8px" ' +
+        'data-id="' + fumAttr_(g.id) + '" data-fecha="' + fumAttr_(g.fechaStr) + '" ' +
+        'data-campo="' + fumAttr_(g.campo) + '" data-lote="' + fumAttr_(g.lote) + '" ' +
+        'data-zona="' + fumAttr_(g.zona || '') + '" data-superficie="' + fumAttr_(g.superficie || 0) + '" ' +
+        'onclick="fumNuevoProducto(this)">+ Agregar producto</button>' +
+      '<button class="btn chico fantasma" style="margin-top:8px" ' +
+        'onclick="fumEditarFecha(this, \'' + fumAttr_(g.id) + '\', \'' + iso + '\')">✎ Corregir la fecha</button>' +
+      '<div class="seccion-tit" style="margin:14px 0 6px">¿Quién fumigó?</div>' +
+      '<div class="chips">' +
+        FUM_OPERADORES.map(function (o) {
+          return '<button class="chip' + (g.operador === o.valor ? ' sel' : '') + '" ' +
+                 'onclick="fumGuardarOperador(this, \'' + fumAttr_(g.id) + '\', \'' + o.valor + '\')">' +
+                 o.label + '</button>';
+        }).join('') +
+      '</div>';
+  }
+
+  return '<div class="item">' +
+    '<div onclick="fumAbrir(this)">' +
+      '<div class="fila1"><span>' + dia + '</span><span>' + escHtml_(g.zona || '—') + '</span></div>' +
+      '<div class="titulo">' + escHtml_(g.campo) + lote + '</div>' +
+      '<div class="desc">' + g.superficie + ' has · ' + n + (n === 1 ? ' producto' : ' productos') + '</div>' +
+    '</div>' +
+    '<div class="fumDet">' +
+      '<div class="seccion-tit" style="margin:6px 0">Productos aplicados</div>' +
+      productos + acciones +
+    '</div>' +
+  '</div>';
+}
+
+function fumAbrir(el) { el.parentElement.classList.toggle('abierta'); }
+
+/* ---------- correcciones ---------- */
+function fumEditarFecha(btn, id, iso) {
+  if (btn.parentElement.querySelector('.fumEditorFecha')) return;
+  var d = document.createElement('div');
+  d.className = 'fumEditor fumEditorFecha';
+  d.innerHTML = '<input type="date" value="' + iso + '">' +
+                '<button class="ok">✓</button><button class="no">✕</button>';
+  d.querySelector('.no').onclick = function () { d.remove(); };
+  d.querySelector('.ok').onclick = function () {
+    var v = d.querySelector('input').value;
+    if (!v) return;
+    var p = v.split('-');
+    this.textContent = '...';
+    fumMandar({ id: id, fechaNueva: p[2] + '/' + p[1] + '/' + p[0] },
+              'Fecha corregida ✓', d);
+  };
+  btn.parentElement.insertBefore(d, btn.nextSibling);
+}
+
+function fumGuardarOperador(btn, id, operador) {
+  var yaEstaba = btn.classList.contains('sel');
+  var valor = yaEstaba ? '' : operador;   // tocar el que ya estaba lo saca
+  var chips = btn.parentElement.querySelectorAll('.chip');
+  for (var i = 0; i < chips.length; i++) chips[i].classList.remove('sel');
+  if (!yaEstaba) btn.classList.add('sel');
+
+  fumDatos.forEach(function (r) {
+    if (r.id && r.id.toLowerCase() === String(id).toLowerCase()) r.operador = valor;
+  });
+  fumMandar({ id: id, operador: valor }, valor ? 'Anotado ✓' : 'Sacado ✓', null);
+}
+
+function fumEditarProducto(fila) {
+  if (fila.querySelector('.fumEditor')) return;
+  var nombre = fila.dataset.nombre || '';
+  var cant = parseFloat(fila.dataset.cantidad) || 0;
+  var nroFila = fila.dataset.fila;
+  var id = fila.dataset.id;
+
+  if (!nroFila) { mostrarToast('Esa fila no tiene número. Actualizá y probá de nuevo.'); return; }
+
+  var d = document.createElement('div');
+  d.className = 'fumEditor';
+  d.innerHTML = '<input type="text" style="flex:2" value="' + fumAttr_(nombre) + '" placeholder="Producto">' +
+                '<input type="text" style="flex:1" value="' + (cant > 0 ? cant : '') + '" placeholder="Cant.">' +
+                '<button class="ok">✓</button><button class="no">✕</button>';
+  d.onclick = function (e) { e.stopPropagation(); };   // el click no debe plegar la tarjeta
+  d.querySelector('.no').onclick = function () { d.remove(); };
+  d.querySelector('.ok').onclick = function () {
+    var ins = d.querySelectorAll('input');
+    var nuevo = ins[0].value.trim();
+    var cantNueva = parseFloat(ins[1].value.trim().replace(',', '.')) || 0;
+    if (!nuevo) { mostrarToast('El producto no puede quedar vacío'); return; }
+    this.textContent = '...';
+    fila.dataset.nombre = nuevo;
+    fila.dataset.cantidad = cantNueva;
+    fila.querySelector('span').textContent = nuevo;
+    fila.querySelector('.cant').textContent = (cantNueva > 0 ? cantNueva.toLocaleString('es-AR') : '') + ' ✎';
+    fumDatos.forEach(function (r) {
+      if (String(r.fila) === String(nroFila)) { r.insumo = nuevo; r.cantidad = cantNueva; }
+    });
+    fumMandar({ id: id, fila: nroFila, nombreNuevo: nuevo, cantidadNueva: cantNueva },
+              'Producto corregido ✓', d);
+  };
+  fila.appendChild(d);
+}
+
+function fumNuevoProducto(btn) {
+  if (btn.parentElement.querySelector('.fumEditorNuevo')) return;
+  var d = document.createElement('div');
+  d.className = 'fumEditor fumEditorNuevo';
+  d.innerHTML = '<input type="text" style="flex:2" placeholder="Producto">' +
+                '<input type="text" style="flex:1" placeholder="Cant.">' +
+                '<button class="ok">✓</button><button class="no">✕</button>';
+  d.querySelector('.no').onclick = function () { d.remove(); };
+  d.querySelector('.ok').onclick = function () {
+    var ins = d.querySelectorAll('input');
+    var nombre = ins[0].value.trim();
+    if (!nombre) { mostrarToast('Poné el nombre del producto'); return; }
+    this.textContent = '...';
+    fumMandar({
+      accion: 'agregarProducto',
+      id: btn.dataset.id, fecha: btn.dataset.fecha, campo: btn.dataset.campo,
+      lote: btn.dataset.lote, zona: btn.dataset.zona, superficie: btn.dataset.superficie,
+      nombreNuevo: nombre,
+      cantidadNueva: parseFloat(ins[1].value.trim().replace(',', '.')) || 0
+    }, 'Producto agregado ✓', d);
+  };
+  btn.parentElement.insertBefore(d, btn);
+}
+
+/* ---------- trabajo nuevo ---------- */
+function fumVolverLista() {
+  document.getElementById('fumPaso1').classList.remove('oculto');
+  document.getElementById('fumPaso2').classList.add('oculto');
+}
+
+function fumNuevoTrabajo() {
+  var sel = document.getElementById('fumNtCampo');
+  var nombres = [], visto = {};
+  fumDatos.forEach(function (r) { if (r.campo && !visto[r.campo]) { visto[r.campo] = 1; nombres.push(r.campo); } });
+  nombres.sort();
+  sel.innerHTML = nombres.map(function (n) {
+    return '<option value="' + fumAttr_(n) + '">' + escHtml_(n) + '</option>';
+  }).join('');
+
+  document.getElementById('fumNtLote').value = '';
+  document.getElementById('fumNtSuperficie').value = '';
+  var h = new Date();
+  document.getElementById('fumNtFecha').value = h.getFullYear() + '-' +
+    String(h.getMonth() + 1).padStart(2, '0') + '-' + String(h.getDate()).padStart(2, '0');
+  document.getElementById('fumNtProductos').innerHTML = '';
+  fumNtAgregarFila();
+  fumOperadorNuevo = '';
+  fumNtPintarOperadores();
+
+  document.getElementById('fumPaso1').classList.add('oculto');
+  document.getElementById('fumPaso2').classList.remove('oculto');
+  window.scrollTo(0, 0);
+}
+
+function fumNtAgregarFila() {
+  var cont = document.getElementById('fumNtProductos');
+  var d = document.createElement('div');
+  d.className = 'fumProdNuevo';
+  d.innerHTML = '<input type="text" style="flex:2" placeholder="Producto">' +
+                '<input type="text" style="flex:1" placeholder="Cant.">' +
+                '<button type="button">✕</button>';
+  d.querySelector('button').onclick = function () { d.remove(); };
+  cont.appendChild(d);
+}
+
+function fumNtPintarOperadores() {
+  var c = document.getElementById('fumNtOperadores');
+  c.innerHTML = '';
+  FUM_OPERADORES.forEach(function (o) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'chip' + (fumOperadorNuevo === o.valor ? ' sel' : '');
+    b.textContent = o.label;
+    b.onclick = function () {
+      fumOperadorNuevo = (fumOperadorNuevo === o.valor) ? '' : o.valor;
+      fumNtPintarOperadores();
+    };
+    c.appendChild(b);
+  });
+}
+
+function fumGuardarTrabajo() {
+  var campo = document.getElementById('fumNtCampo').value;
+  var lote = document.getElementById('fumNtLote').value.trim() || '1';
+  var fechaInput = document.getElementById('fumNtFecha').value;
+  if (!campo) { mostrarToast('Elegí un campo'); return; }
+  if (!fechaInput) { mostrarToast('Elegí una fecha'); return; }
+
+  var p = fechaInput.split('-');
+  var fecha = p[2] + '/' + p[1] + '/' + p[0];
+
+  var productos = [];
+  var filas = document.querySelectorAll('#fumNtProductos .fumProdNuevo');
+  for (var i = 0; i < filas.length; i++) {
+    var ins = filas[i].querySelectorAll('input');
+    var nombre = ins[0].value.trim();
+    if (!nombre) continue;
+    productos.push({ nombre: nombre, cantidad: parseFloat(ins[1].value.trim().replace(',', '.')) || 0 });
+  }
+  if (!productos.length) { mostrarToast('Agregá al menos un producto'); return; }
+
+  var btn = document.getElementById('fumNtGuardar');
+  btn.disabled = true;
+  btn.textContent = 'Guardando...';
+
+  fumMandar({
+    accion: 'crearTrabajo',
+    // el id es la clave con la que el pipeline evita duplicados
+    id: (campo + '|' + lote + '|' + fecha).toLowerCase().trim(),
+    fecha: fecha, campo: campo, lote: lote, zona: fumZonaDe_(campo),
+    superficie: parseFloat(document.getElementById('fumNtSuperficie').value.trim().replace(',', '.')) || 0,
+    productos: productos,
+    operador: fumOperadorNuevo
+  }, 'Trabajo agregado ✓', null, function () {
+    btn.disabled = false;
+    btn.textContent = 'Guardar trabajo';
+    fumVolverLista();
+  });
+}
+
+/**
+ * POST con text/plain y no-cors: la respuesta es opaca, no se puede leer si
+ * salió bien. Por eso se vuelve a traer la planilla, que es la única verdad.
+ * `editor` es el cuadrito de edición que hay que sacar cuando termina.
+ */
+function fumMandar(carga, aviso, editor, alTerminar) {
+  fetch(FUM_SCRIPT, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'text/plain' },
+    body: JSON.stringify(carga)
+  }).then(function () {
+    mostrarToast(aviso);
+    if (editor) editor.remove();
+    if (alTerminar) alTerminar();
+    setTimeout(fumCargar, 900);
+  }).catch(function () {
+    mostrarToast('No se pudo conectar');
+    if (alTerminar) alTerminar();
+  });
 }
 
 /* ====================== CAMIÓN ======================
