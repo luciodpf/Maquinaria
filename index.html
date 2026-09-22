@@ -135,151 +135,224 @@
      Los valores salieron tal cual de camion-pato.html y de app.html.
      ====================================================================== */
 
-  /* --- piel de Fumigación: la app verde de Lalo --- */
+  /* --- piel de Fumigación: portada tal cual de la app verde de Lalo --- */
   html.piel-fum{background:#0f1a0f;}
   body.piel-fum{background:#0f1a0f;color:#e8f0e0;min-height:100vh;}
   body.piel-fum header{background:#162216;border-bottom:1px solid #2a3a2a;}
   body.piel-fum header h1{color:#7ec850;font-family:'Fraunces',Georgia,serif;}
-  body.piel-fum header #quienSoy{color:#9aaa88;}
+  body.piel-fum header #quienSoy{color:#9aaa88;font-family:'DM Mono',monospace;}
 
-  #vFumigacion{font-family:'DM Mono',ui-monospace,monospace;color:#e8f0e0;}
-  #vFumigacion .volver{color:#7ec850;}
-  #vFumigacion .seccion-tit,#vFumigacion .camDia{color:#5a6a50;}
-  #vFumigacion .item{background:#162216;border-color:#2a3a2a;border-radius:12px;}
-  #vFumigacion .item .fila1{color:#5a6a50;font-size:10px;text-transform:uppercase;letter-spacing:.5px;}
-  #vFumigacion .item .titulo{font-family:'Fraunces',Georgia,serif;font-size:17px;color:#e8f0e0;}
-  #vFumigacion .item .desc{color:#9aaa88;font-size:11px;}
-  #vFumigacion .fumStat,#vFumigacion .fumOps,#vFumigacion .fumCampo,
-  #vFumigacion .camBarra{background:#1e2e1e;border-color:#2a3a2a;}
-  #vFumigacion .fumStat b{font-family:'Fraunces',Georgia,serif;font-size:24px;color:#7ec850;}
-  #vFumigacion .fumStat span,#vFumigacion .fumOps .tit,
-  #vFumigacion .fumCampo span{color:#5a6a50;}
-  #vFumigacion .fumOps .fila{color:#9aaa88;font-size:12px;}
-  #vFumigacion .fumOps .fila b{font-family:'Fraunces',Georgia,serif;font-size:15px;
-    color:#7ec850;font-weight:600;}
-  #vFumigacion .fumCampo b{font-family:'Fraunces',Georgia,serif;color:#e8f0e0;}
-  #vFumigacion .camMes span{font-family:'Fraunces',Georgia,serif;font-size:16px;
-    text-transform:capitalize;font-weight:600;}
-  #vFumigacion .camMesBtn{background:none;border:none;color:#9aaa88;}
-  #vFumigacion .fumProd{border-bottom-color:#2a3a2a;font-size:12px;}
-  #vFumigacion .fumProd .cant{color:#7ec850;font-size:11px;}
-  #vFumigacion .chip{background:#1e2e1e;border-color:#2a3a2a;color:#9aaa88;
-    font-family:'DM Mono',monospace;font-size:11px;padding:7px 14px;border-radius:20px;
-    letter-spacing:.3px;}
-  #vFumigacion .chip.sel{background:rgba(126,200,80,.15);border-color:#7ec850;color:#7ec850;}
-  #vFumigacion .campo label{color:#5a6a50;font-size:10px;text-transform:uppercase;
-    letter-spacing:.8px;font-weight:400;}
-  #vFumigacion .campo label .opt{color:#5a6a50;}
-  #vFumigacion .campo input,#vFumigacion .campo select,#vFumigacion .campo textarea{
-    background:#1e2e1e;border-color:#2a3a2a;color:#e8f0e0;
-    font-family:'DM Mono',monospace;font-size:14px;}
-  #vFumigacion .btn.grande,#vFumigacion .btn.grande.verde{background:#4a8a20;color:#fff;
-    border:none;font-family:'DM Mono',monospace;font-weight:500;letter-spacing:.3px;}
-  #vFumigacion .btn.chico.fantasma{background:none;border:1px solid #2a3a2a;color:#9aaa88;
-    font-family:'DM Mono',monospace;font-size:11px;border-radius:8px;width:100%;}
-  #vFumigacion .fumEditor input,#vFumigacion .fumProdNuevo input{background:#0f1a0f;
-    border:1px solid #7ec850;color:#e8f0e0;font-family:'DM Mono',monospace;font-size:12px;}
-  #vFumigacion .fumEditor .ok{background:#4a8a20;}
-  #vFumigacion .fumEditor .no,#vFumigacion .fumProdNuevo button{background:none;
-    border:1px solid #2a3a2a;color:#5a6a50;}
-
-  /* --- piel de Camión: la app azul de Pato --- */
+  #vFumigacion{
+    --bg:#0f1a0f; --bg3:#1e2e1e; --card:#162216; --border:#2a3a2a;
+    --accent:#7ec850; --accent2:#4a8a20;
+    --text:#e8f0e0; --text2:#9aaa88; --text3:#5a6a50;
+    font-family:'DM Mono',ui-monospace,monospace;color:var(--text);
+  }
+  #vFumigacion .fumBarra{display:flex;align-items:center;justify-content:space-between;}
+  #vFumigacion .volver{color:var(--accent);padding:8px 0;}
+  #vFumigacion .sync-btn{background:none;border:1px solid var(--border);color:var(--text2);
+    padding:6px 12px;border-radius:20px;font-family:'DM Mono',monospace;font-size:11px;
+    display:flex;align-items:center;gap:6px;cursor:pointer;}
+  #vFumigacion .tabs{display:flex;border-bottom:1px solid var(--border);}
+  #vFumigacion .tab{flex:1;text-align:center;padding:10px 8px;font-size:12px;color:var(--text3);
+    border-bottom:2px solid transparent;letter-spacing:.5px;text-transform:uppercase;
+    margin-bottom:-1px;cursor:pointer;}
+  #vFumigacion .tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+  #vFumigacion .zona-bar{display:flex;gap:6px;padding:12px 0;}
+  #vFumigacion .zona-btn{background:none;border:1px solid var(--border);color:var(--text3);
+    padding:5px 14px;border-radius:20px;font-family:'DM Mono',monospace;font-size:11px;
+    letter-spacing:.3px;cursor:pointer;}
+  #vFumigacion .zona-btn.active{background:rgba(126,200,80,.12);border-color:var(--accent);color:var(--accent);}
+  #vFumigacion .stats-bar{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:20px;}
+  #vFumigacion .stats-bar.dos{grid-template-columns:1fr 1fr;margin-bottom:16px;}
+  #vFumigacion .stat-card{background:var(--bg3);border:1px solid var(--border);border-radius:12px;
+    padding:12px;text-align:center;}
+  #vFumigacion .stat-num{font-family:'Fraunces',Georgia,serif;font-size:24px;font-weight:600;
+    color:var(--accent);line-height:1;}
+  #vFumigacion .stat-label{font-size:9px;color:var(--text3);text-transform:uppercase;
+    letter-spacing:.5px;margin-top:4px;}
+  #vFumigacion .month-nav{display:flex;align-items:center;justify-content:space-between;
+    margin-bottom:16px;background:var(--bg3);border:1px solid var(--border);
+    border-radius:8px;padding:8px 4px;}
+  #vFumigacion .month-btn{background:none;border:none;color:var(--text2);font-size:18px;
+    padding:4px 14px;cursor:pointer;}
+  #vFumigacion .month-label{font-family:'Fraunces',Georgia,serif;font-size:16px;font-weight:600;
+    color:var(--text);text-transform:capitalize;}
+  #vFumigacion .app-card{background:var(--card);border:1px solid var(--border);border-radius:12px;
+    margin-bottom:10px;overflow:hidden;cursor:pointer;}
+  #vFumigacion .app-card.expanded{border-color:var(--accent);}
+  #vFumigacion .card-main{padding:14px 16px;display:flex;align-items:flex-start;gap:12px;}
+  #vFumigacion .card-date-block{background:var(--bg3);border-radius:8px;padding:6px 10px;
+    text-align:center;min-width:48px;flex-shrink:0;}
+  #vFumigacion .card-day{font-family:'Fraunces',Georgia,serif;font-size:22px;font-weight:600;
+    color:var(--accent);line-height:1;}
+  #vFumigacion .card-month-short{font-size:9px;color:var(--text3);text-transform:uppercase;
+    letter-spacing:.5px;}
+  #vFumigacion .card-info{flex:1;min-width:0;}
+  #vFumigacion .card-campo{font-family:'Fraunces',Georgia,serif;font-size:17px;font-weight:600;
+    color:var(--text);margin-bottom:3px;}
+  #vFumigacion .card-lote{font-size:11px;color:var(--text2);margin-bottom:6px;}
+  #vFumigacion .card-tags{display:flex;gap:6px;flex-wrap:wrap;}
+  #vFumigacion .tag{font-size:10px;padding:3px 8px;border-radius:20px;letter-spacing:.3px;}
+  #vFumigacion .tag-has{background:rgba(126,200,80,.12);color:var(--accent);
+    border:1px solid rgba(126,200,80,.25);}
+  #vFumigacion .tag-zona{background:rgba(255,255,255,.04);color:var(--text3);border:1px solid var(--border);}
+  #vFumigacion .tag-prod{background:rgba(255,255,255,.04);color:var(--text2);border:1px solid var(--border);}
+  #vFumigacion .card-detail{display:none;border-top:1px solid var(--border);padding:12px 16px;}
+  #vFumigacion .app-card.expanded .card-detail{display:block;}
+  #vFumigacion .detail-title{font-size:10px;text-transform:uppercase;letter-spacing:.8px;
+    color:var(--text3);margin-bottom:8px;}
+  #vFumigacion .product-row{padding:7px 0;border-bottom:1px solid var(--border);}
+  #vFumigacion .product-row:last-child{border-bottom:none;}
+  #vFumigacion .product-view{display:flex;justify-content:space-between;align-items:center;gap:8px;}
+  #vFumigacion .product-name{font-size:12px;color:var(--text);flex:1;}
+  #vFumigacion .product-qty{font-size:11px;color:var(--accent);white-space:nowrap;
+    display:flex;align-items:center;gap:6px;}
+  #vFumigacion .edit-icon{font-size:10px;color:var(--text3);opacity:.5;}
+  #vFumigacion .campo-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px;}
+  #vFumigacion .campo-chip{background:var(--bg3);border:1px solid var(--border);border-radius:8px;
+    padding:12px;text-align:center;cursor:pointer;}
+  #vFumigacion .campo-chip-name{font-family:'Fraunces',Georgia,serif;font-size:14px;font-weight:600;
+    color:var(--text);margin-bottom:3px;}
+  #vFumigacion .campo-chip-count{font-size:10px;color:var(--text3);}
+  #vFumigacion .operador-section{margin-top:12px;border-top:1px solid var(--border);padding-top:10px;}
+  #vFumigacion .operador-title{font-size:10px;text-transform:uppercase;letter-spacing:.8px;
+    color:var(--text3);margin-bottom:8px;}
+  #vFumigacion .operador-btns{display:flex;gap:6px;flex-wrap:wrap;}
+  #vFumigacion .op-btn{background:var(--bg3);border:1px solid var(--border);color:var(--text2);
+    padding:7px 12px;border-radius:20px;font-family:'DM Mono',monospace;font-size:11px;cursor:pointer;}
+  #vFumigacion .op-btn.selected{background:rgba(126,200,80,.15);border-color:var(--accent);
+    color:var(--accent);font-weight:500;}
+  #vFumigacion .op-stats{background:var(--bg3);border:1px solid var(--border);border-radius:12px;
+    padding:12px 14px;margin-bottom:16px;}
+  #vFumigacion .op-stats-title{font-size:10px;text-transform:uppercase;letter-spacing:.8px;
+    color:var(--text3);margin-bottom:10px;}
+  #vFumigacion .op-stat-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;}
+  #vFumigacion .op-stat-name{font-size:12px;color:var(--text2);}
+  #vFumigacion .op-stat-has{font-family:'Fraunces',Georgia,serif;font-size:15px;color:var(--accent);}
+  #vFumigacion .op-stat-empty{font-size:11px;color:var(--text3);font-style:italic;}
+  #vFumigacion .edit-fecha-btn{display:flex;align-items:center;justify-content:center;gap:6px;
+    background:none;border:1px solid var(--border);color:var(--text2);padding:7px 12px;
+    border-radius:8px;font-family:'DM Mono',monospace;font-size:11px;margin-top:10px;
+    width:100%;cursor:pointer;}
+  #vFumigacion .fecha-editor{margin-top:10px;display:flex;gap:8px;align-items:center;}
+  #vFumigacion .fecha-input{flex:1;min-width:0;background:var(--bg);border:1px solid var(--accent);
+    color:var(--text);padding:8px 12px;border-radius:8px;font-family:'DM Mono',monospace;font-size:12px;}
+  #vFumigacion .fecha-save-btn{background:var(--accent2);border:none;color:#fff;padding:8px 14px;
+    border-radius:8px;font-family:'DM Mono',monospace;font-size:11px;cursor:pointer;}
+  #vFumigacion .fecha-cancel-btn{background:none;border:1px solid var(--border);color:var(--text3);
+    padding:8px 10px;border-radius:8px;font-family:'DM Mono',monospace;font-size:11px;cursor:pointer;}
+  #vFumigacion .section-header{font-size:10px;text-transform:uppercase;letter-spacing:1px;
+    color:var(--text3);margin:20px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--border);}
+  #vFumigacion .empty-state{text-align:center;padding:40px 20px;color:var(--text3);}
+  #vFumigacion .empty-icon{font-size:40px;margin-bottom:12px;}
+  #vFumigacion .empty-text{font-size:13px;line-height:1.6;}
+  #vFumigacion .back-btn{display:flex;align-items:center;gap:6px;background:none;
+    border:1px solid var(--border);color:var(--text2);padding:8px 14px;border-radius:8px;
+    font-family:'DM Mono',monospace;font-size:11px;margin-bottom:16px;cursor:pointer;}
+  #vFumigacion .fab-add{position:fixed;right:20px;bottom:20px;width:54px;height:54px;
+    border-radius:50%;background:var(--accent2);color:#fff;border:none;font-size:28px;line-height:1;
+    box-shadow:0 4px 14px rgba(0,0,0,.4);z-index:200;display:flex;align-items:center;
+    justify-content:center;cursor:pointer;}
+  #vFumigacion .modal-title{font-family:'Fraunces',Georgia,serif;font-size:18px;font-weight:600;
+    color:var(--text);margin-bottom:16px;}
+  #vFumigacion .form-group{margin-bottom:14px;}
+  #vFumigacion .form-label{display:block;font-size:10px;text-transform:uppercase;
+    letter-spacing:.5px;color:var(--text3);margin-bottom:6px;}
+  #vFumigacion .filter-select{width:100%;background:var(--bg3);border:1px solid var(--border);
+    color:var(--text);padding:10px 14px;border-radius:8px;font-family:'DM Mono',monospace;font-size:12px;}
+  #vFumigacion .producto-input-row{display:flex;gap:8px;align-items:center;margin-bottom:8px;}
+  #vFumigacion .guardar-btn{width:100%;background:var(--accent2);border:none;color:#fff;padding:14px;
+    border-radius:8px;font-family:'DM Mono',monospace;font-size:13px;margin-top:18px;cursor:pointer;}
+  /* --- piel de Camión: portada tal cual de la app azul de Pato --- */
   html.piel-cam{background:#0f0f1a;}
   body.piel-cam{background:#0f0f1a;color:#e8e8f0;min-height:100vh;}
   body.piel-cam header{background:#1a1a2e;border-bottom:1px solid #2e2e4a;}
   body.piel-cam header h1{color:#e8c547;font-family:'IBM Plex Mono',monospace;font-size:17px;}
   body.piel-cam header #quienSoy{color:#7070a0;font-family:'IBM Plex Mono',monospace;}
 
-  #vCamion{font-family:'IBM Plex Sans',sans-serif;color:#e8e8f0;}
-  #vCamion .volver{color:#e8c547;}
-  #vCamion .item{background:#1a1a2e;border-color:#2e2e4a;border-radius:10px;}
-  #vCamion .item .fila1{color:#7070a0;font-family:'IBM Plex Mono',monospace;font-size:12px;}
-  #vCamion .item .titulo{font-size:14px;font-weight:600;color:#e8e8f0;}
-  #vCamion .item .desc{color:#7070a0;font-size:12px;}
-  #vCamion .camBarra{background:#1a1a2e;border-color:#2e2e4a;}
-  #vCamion .camMes{font-family:'IBM Plex Mono',monospace;font-size:15px;
-    text-transform:uppercase;letter-spacing:.08em;}
-  #vCamion .camMesBtn{background:#22223a;border-color:#2e2e4a;color:#e8e8f0;}
-  #vCamion .camKm b{color:#4fc3f7;font-family:'IBM Plex Mono',monospace;}
-  #vCamion .camKm span{color:#7070a0;font-family:'IBM Plex Mono',monospace;}
-  #vCamion .camDia{color:#7070a0;font-family:'IBM Plex Mono',monospace;letter-spacing:.1em;}
-  #vCamion .campo label{color:#7070a0;font-family:'IBM Plex Mono',monospace;font-size:11px;
-    text-transform:uppercase;letter-spacing:.08em;font-weight:400;}
-  #vCamion .campo input,#vCamion .campo select,#vCamion .campo textarea{background:#22223a;
-    border-color:#2e2e4a;color:#e8e8f0;font-family:'IBM Plex Sans',sans-serif;font-size:15px;}
-  #vCamion .chip{background:#22223a;border-color:#2e2e4a;color:#7070a0;}
-  #vCamion .chip.sel{background:rgba(232,197,71,.1);border-color:#e8c547;color:#e8c547;}
-  #vCamion .camTipos .chip{font-family:'IBM Plex Mono',monospace;}
-  #vCamion .btn.grande,#vCamion .btn.grande.verde{background:#e8c547;color:#0f0f1a;
-    border:none;font-weight:600;}
-  #vCamion .btn.chico.fantasma{background:rgba(232,197,71,.12);
-    border:1px solid rgba(232,197,71,.2);color:#e8c547;
-    font-family:'IBM Plex Mono',monospace;font-size:11px;}
-  /* borrar en rojo, como estaba en la app de Pato */
-  #vCamion .camAcc .btn:last-child{background:rgba(255,107,107,.12);
-    border-color:rgba(255,107,107,.2);color:#ff6b6b;}
-  #vCamion .cat-pill{font-family:'IBM Plex Mono',monospace;}
-  #vCamion .cat-log{background:rgba(232,197,71,.15);color:#e8c547;}
-  #vCamion .cat-rep{background:rgba(79,195,247,.15);color:#4fc3f7;}
-  #vCamion .cat-gan{background:rgba(255,107,107,.15);color:#ff6b6b;}
-  #vCamion .cat-lab{background:rgba(105,219,124,.15);color:#69db7c;}
-
-  /* fumigación */
-  .fumStats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;}
-  .fumStats.dos{grid-template-columns:1fr 1fr;}
-  .fumStat{background:var(--panel);border:1px solid var(--borde);border-radius:12px;
-    padding:10px 6px;text-align:center;}
-  .fumStat b{display:block;font-size:19px;font-weight:700;}
-  .fumStat span{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;}
-  .fumOps{background:var(--panel);border:1px solid var(--borde);border-radius:12px;
-    padding:10px 14px;margin-bottom:12px;}
-  .fumOps .tit{font-size:11px;color:var(--muted);text-transform:uppercase;
-    letter-spacing:.04em;font-weight:700;margin-bottom:6px;}
-  .fumOps .fila{display:flex;justify-content:space-between;font-size:13px;padding:3px 0;}
-  .fumOps .fila b{font-weight:600;}
-  .fumCampos{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
-  .fumCampo{background:var(--panel);border:1px solid var(--borde);border-radius:12px;
-    padding:14px 10px;text-align:center;}
-  .fumCampo b{display:block;font-size:15px;font-weight:700;text-transform:capitalize;}
-  .fumCampo span{font-size:11px;color:var(--muted);}
-  .fumDet{display:none;border-top:1px solid var(--borde);margin-top:10px;padding-top:8px;}
-  .item.abierta .fumDet{display:block;}
-  .fumProd{display:flex;justify-content:space-between;align-items:center;gap:10px;
-    font-size:14px;padding:7px 0;border-bottom:1px solid var(--borde);}
-  .fumProd:last-child{border-bottom:none;}
-  .fumProd .cant{color:var(--muted);white-space:nowrap;}
-  .fumEditor{display:flex;gap:6px;margin:8px 0;}
-  .fumEditor input{flex:1;min-width:0;padding:9px;border:1px solid var(--borde);
-    border-radius:8px;font-size:15px;background:#fff;}
-  .fumEditor .ok,.fumEditor .no{border:none;border-radius:8px;padding:0 13px;font-size:15px;color:#fff;}
-  .fumEditor .ok{background:var(--verde);}
-  .fumEditor .no{background:#b5b0a4;}
-  .fumOk{text-align:center;color:var(--verde);font-size:12px;font-weight:700;padding:6px 0;}
-  .fumProdNuevo{display:flex;gap:6px;margin-bottom:8px;}
-  .fumProdNuevo input{flex:1;min-width:0;padding:12px;border:1px solid var(--borde);
-    border-radius:10px;font-size:16px;background:#fff;}
-  .fumProdNuevo button{border:none;background:#b5b0a4;color:#fff;border-radius:10px;padding:0 14px;}
-
-  /* camion */
-  .camBarra{display:flex;align-items:center;justify-content:space-between;gap:10px;
-    background:var(--panel);border:1px solid var(--borde);border-radius:12px;
+  #vCamion{
+    --bg:#0f0f1a; --surface:#1a1a2e; --surface2:#22223a; --border:#2e2e4a;
+    --accent:#e8c547; --accent2:#4fc3f7; --text:#e8e8f0; --muted:#7070a0;
+    --danger:#ff6b6b; --success:#69db7c;
+    font-family:'IBM Plex Sans',sans-serif;color:var(--text);
+  }
+  #vCamion .camBarra{display:flex;align-items:center;justify-content:space-between;
+    background:none;border:none;padding:0;margin-bottom:12px;}
+  #vCamion .volver{color:var(--accent);}
+  #vCamion .km-badge{background:var(--surface2);border:1px solid var(--border);border-radius:8px;
+    padding:6px 12px;text-align:right;}
+  #vCamion .km-label{font-size:10px;color:var(--muted);font-family:'IBM Plex Mono',monospace;}
+  #vCamion .km-value{font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:600;
+    color:var(--accent2);}
+  #vCamion .month-nav{display:flex;align-items:center;justify-content:space-between;
+    background:var(--surface);border:1px solid var(--border);border-radius:10px;
     padding:8px 10px;margin-bottom:12px;}
-  .camMes{display:flex;align-items:center;gap:6px;font-weight:700;font-size:14px;}
-  .camMesBtn{background:var(--bg);border:1px solid var(--borde);border-radius:8px;
-    width:30px;height:30px;font-size:17px;color:var(--ink);line-height:1;}
-  .camKm{text-align:right;line-height:1.25;}
-  .camKm b{display:block;font-size:14px;color:var(--accent2);}
-  .camKm span{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;}
-  .camTipos{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;}
-  .camTipos .chip{border-radius:10px;text-align:center;padding:10px 2px;font-size:11px;}
-  .camTipos .chip .ic{display:block;font-size:19px;margin-bottom:3px;}
-  /* el KM y los kilos no necesitan el numero gigante de las cargas de gasoil */
-  .campo.chico input[type=number]{font-size:16px;font-weight:400;text-align:left;}
-  .camDia{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;
-    letter-spacing:.03em;margin:16px 0 6px;}
-  .camAcc{display:flex;gap:8px;margin-top:8px;}
-  .camAcc .btn{margin-bottom:0;}
-
+  #vCamion .month-btn{background:var(--surface2);border:1px solid var(--border);color:var(--text);
+    width:36px;height:36px;border-radius:8px;font-size:18px;cursor:pointer;}
+  #vCamion .month-label{font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:600;
+    text-transform:uppercase;letter-spacing:.08em;}
+  #vCamion .day-label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);
+    text-transform:uppercase;letter-spacing:.1em;padding:12px 4px 4px;}
+  #vCamion .record-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;
+    padding:12px 14px;margin-bottom:8px;display:flex;align-items:flex-start;gap:12px;}
+  #vCamion .rec-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;
+    justify-content:center;font-size:18px;flex-shrink:0;}
+  #vCamion .tv .rec-icon{background:rgba(232,197,71,.12);}
+  #vCamion .tc .rec-icon{background:rgba(79,195,247,.12);}
+  #vCamion .tr .rec-icon{background:rgba(255,107,107,.12);}
+  #vCamion .tm .rec-icon{background:rgba(105,219,124,.12);}
+  #vCamion .rec-info{flex:1;min-width:0;}
+  #vCamion .rec-title{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;
+    text-overflow:ellipsis;}
+  #vCamion .rec-detail{font-size:12px;color:var(--muted);margin-top:3px;}
+  #vCamion .rec-obs{font-size:11px;color:var(--muted);margin-top:3px;font-style:italic;}
+  #vCamion .rec-carta{font-size:11px;color:var(--accent2);margin-top:2px;
+    font-family:'IBM Plex Mono',monospace;}
+  #vCamion .rec-meta{text-align:right;flex-shrink:0;}
+  #vCamion .rec-km{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--accent2);}
+  #vCamion .badge{display:inline-block;font-size:10px;font-family:'IBM Plex Mono',monospace;
+    text-transform:uppercase;padding:2px 6px;border-radius:4px;margin-top:4px;}
+  #vCamion .bv{background:rgba(232,197,71,.15);color:var(--accent);}
+  #vCamion .bc{background:rgba(79,195,247,.15);color:var(--accent2);}
+  #vCamion .br{background:rgba(255,107,107,.15);color:var(--danger);}
+  #vCamion .bm{background:rgba(105,219,124,.15);color:var(--success);}
+  #vCamion .card-actions{display:flex;gap:6px;margin-top:8px;}
+  #vCamion .btn-edit,#vCamion .btn-del{border-radius:6px;font-size:11px;
+    font-family:'IBM Plex Mono',monospace;padding:4px 10px;cursor:pointer;}
+  #vCamion .btn-edit{background:rgba(232,197,71,.12);color:var(--accent);
+    border:1px solid rgba(232,197,71,.2);}
+  #vCamion .btn-del{background:rgba(255,107,107,.12);color:var(--danger);
+    border:1px solid rgba(255,107,107,.2);}
+  #vCamion .vacio{color:var(--muted);text-align:center;padding:40px 20px;font-size:13px;}
+  #vCamion .fab{position:fixed;bottom:24px;right:20px;background:var(--accent);color:#0f0f1a;
+    border:none;border-radius:50px;padding:14px 24px;font-size:15px;font-weight:600;cursor:pointer;
+    display:flex;align-items:center;gap:8px;box-shadow:0 4px 20px rgba(232,197,71,.35);z-index:200;}
+  #vCamion .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  #vCamion .form-group{display:flex;flex-direction:column;gap:6px;margin-bottom:16px;}
+  #vCamion .form-group label{font-size:11px;font-family:'IBM Plex Mono',monospace;
+    text-transform:uppercase;letter-spacing:.08em;color:var(--muted);}
+  #vCamion input,#vCamion select,#vCamion textarea{background:var(--surface2);
+    border:1px solid var(--border);border-radius:8px;color:var(--text);
+    font-family:'IBM Plex Sans',sans-serif;font-size:15px;padding:10px 12px;width:100%;
+    appearance:none;-webkit-appearance:none;outline:none;}
+  #vCamion input:focus,#vCamion select:focus,#vCamion textarea:focus{border-color:var(--accent);}
+  #vCamion textarea{resize:vertical;min-height:70px;}
+  #vCamion .type-selector{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;}
+  #vCamion .type-btn{background:var(--surface2);border:1px solid var(--border);border-radius:8px;
+    padding:10px 4px;text-align:center;cursor:pointer;}
+  #vCamion .type-btn .t-icon{font-size:20px;display:block;}
+  #vCamion .type-btn .t-label{font-size:10px;color:var(--muted);
+    font-family:'IBM Plex Mono',monospace;display:block;margin-top:4px;}
+  #vCamion .type-btn.active{border-color:var(--accent);background:rgba(232,197,71,.1);}
+  #vCamion .type-btn.active .t-label{color:var(--accent);}
+  #vCamion .fields-section{display:flex;flex-direction:column;gap:12px;}
+  #vCamion .submit-btn{background:var(--accent);color:#0f0f1a;border:none;border-radius:10px;
+    padding:14px;font-size:15px;font-weight:600;cursor:pointer;width:100%;margin-top:8px;}
+  #vCamion .submit-btn:disabled{opacity:.5;}
+  #vCamion .edit-badge{display:inline-block;background:rgba(232,197,71,.15);color:var(--accent);
+    font-size:11px;font-family:'IBM Plex Mono',monospace;padding:2px 8px;border-radius:6px;
+    margin-left:8px;}
   /* planilla de remitos: filas tipo Excel, sin fotos */
   .tablaWrap{overflow-x:auto;-webkit-overflow-scrolling:touch;background:var(--panel);
     border:1px solid var(--borde);border-radius:12px;}
@@ -438,54 +511,57 @@
   <section id="vFumigacion" class="oculto">
 
     <div id="fumPaso1">
-      <button class="volver" onclick="ir('home')">‹ Volver</button>
-
-      <div class="filtros" id="fumTabs">
-        <button class="chip sel" id="fumTabMes" onclick="fumVerTab('mes')">Este mes</button>
-        <button class="chip" id="fumTabCampo" onclick="fumVerTab('campo')">Por campo</button>
-        <button class="chip" onclick="fumCargar()">↻</button>
+      <div class="fumBarra">
+        <button class="volver" onclick="ir('home')">‹ Volver</button>
+        <button class="sync-btn" onclick="fumCargar()"><span>↻</span> Actualizar</button>
       </div>
 
-      <div class="chips" id="fumChipsZona" style="margin-bottom:12px"></div>
+      <div class="tabs">
+        <div class="tab active" id="fumTabMes" onclick="fumVerTab('mes')">Este mes</div>
+        <div class="tab" id="fumTabCampo" onclick="fumVerTab('campo')">Por campo</div>
+      </div>
+
+      <div class="zona-bar" id="fumZonas"></div>
 
       <div id="fumContenido"></div>
 
-      <button class="btn grande verde" onclick="fumNuevoTrabajo()">+ Nuevo trabajo</button>
+      <button class="fab-add" onclick="fumNuevoTrabajo()" title="Nuevo trabajo">+</button>
     </div>
 
     <div id="fumPaso2" class="oculto">
-      <button class="volver" onclick="fumVolverLista()">‹ Volver</button>
-      <p style="font-weight:700;font-size:16px;">Nuevo trabajo</p>
+      <button class="back-btn" onclick="fumVolverLista()">← Volver</button>
+      <div class="modal-title">Nuevo trabajo</div>
 
-      <div class="campo">
-        <label>Campo</label>
-        <select id="fumNtCampo"></select>
+      <div class="form-group">
+        <label class="form-label">Campo</label>
+        <select class="filter-select" id="fumNtCampo"></select>
       </div>
-      <div class="campo chico">
-        <label>Lote</label>
-        <input type="text" id="fumNtLote" placeholder="1">
+      <div class="form-group">
+        <label class="form-label">Lote</label>
+        <input type="text" class="fecha-input" id="fumNtLote" placeholder="1" style="width:100%">
       </div>
-      <div class="campo chico">
-        <label>Fecha</label>
-        <input type="date" id="fumNtFecha">
+      <div class="form-group">
+        <label class="form-label">Fecha</label>
+        <input type="date" class="fecha-input" id="fumNtFecha" style="width:100%">
       </div>
-      <div class="campo chico">
-        <label>Hectáreas</label>
-        <input type="text" id="fumNtSuperficie" inputmode="decimal" placeholder="0">
+      <div class="form-group">
+        <label class="form-label">Hectáreas</label>
+        <input type="text" class="fecha-input" id="fumNtSuperficie" inputmode="decimal"
+               placeholder="0" style="width:100%">
       </div>
 
-      <div class="campo">
-        <label>Productos</label>
+      <div class="form-group">
+        <label class="form-label">Productos</label>
         <div id="fumNtProductos"></div>
-        <button class="btn chico fantasma" onclick="fumNtAgregarFila()">+ Agregar otro producto</button>
+        <button class="edit-fecha-btn" onclick="fumNtAgregarFila()">+ Agregar otro producto</button>
       </div>
 
-      <div class="campo">
-        <label>¿Quién fumigó? <span class="opt">— opcional, se puede cargar después</span></label>
-        <div class="chips" id="fumNtOperadores"></div>
+      <div class="form-group">
+        <label class="form-label">¿Quién fumigó? (opcional, se puede cargar después)</label>
+        <div class="operador-btns" id="fumNtOperadores"></div>
       </div>
 
-      <button class="btn grande" id="fumNtGuardar" onclick="fumGuardarTrabajo()">Guardar trabajo</button>
+      <button class="guardar-btn" id="fumNtGuardar" onclick="fumGuardarTrabajo()">Guardar trabajo</button>
     </div>
 
   </section>
@@ -497,124 +573,133 @@
   <section id="vCamion" class="oculto">
 
     <div id="camPaso1">
-      <button class="volver" onclick="ir('home')">‹ Volver</button>
-
       <div class="camBarra">
-        <div class="camMes">
-          <button class="camMesBtn" onclick="camCambiarMes(-1)">‹</button>
-          <span id="camMesLabel">—</span>
-          <button class="camMesBtn" onclick="camCambiarMes(1)">›</button>
-        </div>
-        <div class="camKm">
-          <span>Último KM</span>
-          <b id="camUltimoKm">—</b>
+        <button class="volver" onclick="ir('home')">‹ Volver</button>
+        <div class="km-badge">
+          <div class="km-label">Último KM</div>
+          <div class="km-value" id="camUltimoKm">—</div>
         </div>
       </div>
 
-      <button class="btn grande verde" onclick="camNueva()">+ Nueva novedad</button>
+      <div class="month-nav">
+        <button class="month-btn" onclick="camCambiarMes(-1)">‹</button>
+        <div class="month-label" id="camMesLabel">—</div>
+        <button class="month-btn" onclick="camCambiarMes(1)">›</button>
+      </div>
 
-      <div class="lista" id="camLista"></div>
+      <div id="camLista"></div>
+
+      <button class="fab" onclick="camNueva()"><span>+</span> Nueva novedad</button>
     </div>
 
     <div id="camPaso2" class="oculto">
       <button class="volver" onclick="camVolverLista()">‹ Volver</button>
-      <p style="font-weight:700;font-size:16px;" id="camTituloForm">Nueva novedad</p>
+      <p style="font-weight:700;font-size:16px;margin-bottom:16px" id="camTituloForm">
+        Nueva novedad</p>
 
-      <div class="row" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-        <div class="campo chico">
+      <div class="form-row">
+        <div class="form-group">
           <label>Fecha</label>
           <input type="date" id="camFecha">
         </div>
-        <div class="campo chico">
-          <label>KM del camión</label>
+        <div class="form-group">
+          <label>KM camión</label>
           <input type="number" id="camKmCamion" inputmode="numeric" placeholder="0">
         </div>
       </div>
 
-      <div class="campo">
-        <label>¿Qué pasó?</label>
-        <div class="camTipos" id="camChipsTipo"></div>
+      <div class="form-group">
+        <label>Tipo de novedad</label>
+        <div class="type-selector" id="camChipsTipo"></div>
       </div>
 
-      <div id="camCampos-Viaje">
-        <div class="campo chico">
-          <label>Origen</label>
-          <input type="text" id="camOrigen" list="camDlOrigen" placeholder="Ej: AFA">
-          <datalist id="camDlOrigen"></datalist>
+      <div id="camCampos-Viaje" class="fields-section">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Origen</label>
+            <input type="text" id="camOrigen" list="camDlOrigen" placeholder="Ej: AFA">
+            <datalist id="camDlOrigen"></datalist>
+          </div>
+          <div class="form-group">
+            <label>Destino</label>
+            <input type="text" id="camDestino" list="camDlDestino" placeholder="Ej: Renova">
+            <datalist id="camDlDestino"></datalist>
+          </div>
         </div>
-        <div class="campo chico">
-          <label>Destino</label>
-          <input type="text" id="camDestino" list="camDlDestino" placeholder="Ej: Renova">
-          <datalist id="camDlDestino"></datalist>
+        <div class="form-row">
+          <div class="form-group">
+            <label>KMs recorridos</label>
+            <input type="number" id="camKmsRec" inputmode="numeric" placeholder="0">
+          </div>
+          <div class="form-group">
+            <label>Especie</label>
+            <input type="text" id="camEspecie" list="camDlEspecies" placeholder="Ej: Soja">
+            <datalist id="camDlEspecies">
+              <option value="Soja"><option value="Maíz"><option value="Girasol"><option value="Trigo"><option value="Sorgo">
+            </datalist>
+          </div>
         </div>
-        <div class="campo chico">
-          <label>KMs recorridos</label>
-          <input type="number" id="camKmsRec" inputmode="numeric" placeholder="0">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Kilos</label>
+            <input type="number" id="camKilos" inputmode="numeric" placeholder="0">
+          </div>
+          <div class="form-group">
+            <label>Carta de porte</label>
+            <input type="text" id="camCartaPorte" placeholder="Nro.">
+          </div>
         </div>
-        <div class="campo chico">
-          <label>Especie</label>
-          <input type="text" id="camEspecie" list="camDlEspecies" placeholder="Ej: Soja">
-          <datalist id="camDlEspecies">
-            <option value="Soja"><option value="Maíz"><option value="Girasol"><option value="Trigo"><option value="Sorgo">
-          </datalist>
-        </div>
-        <div class="campo chico">
-          <label>Kilos</label>
-          <input type="number" id="camKilos" inputmode="numeric" placeholder="0">
-        </div>
-        <div class="campo chico">
-          <label>Carta de porte</label>
-          <input type="text" id="camCartaPorte" placeholder="Nro.">
-        </div>
-        <div class="campo">
+        <div class="form-group">
           <label>Observaciones</label>
           <textarea id="camObs" placeholder="Alguna observación..."></textarea>
         </div>
       </div>
 
-      <div id="camCampos-Combustible" class="oculto">
-        <div class="campo chico">
-          <label>Litros</label>
-          <input type="number" id="camLitros" inputmode="decimal" placeholder="0">
+      <div id="camCampos-Combustible" class="fields-section oculto">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Litros</label>
+            <input type="number" id="camLitros" inputmode="decimal" placeholder="0">
+          </div>
+          <div class="form-group">
+            <label>Proveedor</label>
+            <input type="text" id="camProvComb" list="camDlProveedores" placeholder="Ej: AFA">
+            <datalist id="camDlProveedores"></datalist>
+          </div>
         </div>
-        <div class="campo chico">
-          <label>Proveedor</label>
-          <input type="text" id="camProvComb" list="camDlProveedores" placeholder="Ej: AFA">
-          <datalist id="camDlProveedores"></datalist>
-        </div>
-        <div class="campo">
+        <div class="form-group">
           <label>Observaciones</label>
           <textarea id="camObsComb" placeholder="Alguna observación..."></textarea>
         </div>
       </div>
 
-      <div id="camCampos-Reparacion" class="oculto">
-        <div class="campo">
-          <label>¿Qué se reparó?</label>
+      <div id="camCampos-Reparacion" class="fields-section oculto">
+        <div class="form-group">
+          <label>Actividad</label>
           <input type="text" id="camActRep" placeholder="Describí la reparación">
         </div>
-        <div class="campo chico">
-          <label>Taller / proveedor</label>
+        <div class="form-group">
+          <label>Proveedor / taller</label>
           <input type="text" id="camProvRep" placeholder="Nombre">
         </div>
-        <div class="campo">
+        <div class="form-group">
           <label>Observaciones</label>
           <textarea id="camObsRep" placeholder="Alguna observación..."></textarea>
         </div>
       </div>
 
-      <div id="camCampos-Mantenimiento" class="oculto">
-        <div class="campo">
-          <label>¿Qué se hizo?</label>
+      <div id="camCampos-Mantenimiento" class="fields-section oculto">
+        <div class="form-group">
+          <label>Actividad</label>
           <input type="text" id="camActMant" placeholder="Describí el mantenimiento">
         </div>
-        <div class="campo">
+        <div class="form-group">
           <label>Observaciones</label>
           <textarea id="camObsMant" placeholder="Alguna observación..."></textarea>
         </div>
       </div>
 
-      <button class="btn grande" id="camBtnGuardar" onclick="camGuardar()">Guardar novedad</button>
+      <button class="submit-btn" id="camBtnGuardar" onclick="camGuardar()">Guardar novedad</button>
     </div>
 
   </section>
@@ -1419,18 +1504,18 @@ function fumAgrupar(filas) {
 function fumVerTab(t) {
   fumTab = t;
   fumCampoSel = null;
-  document.getElementById('fumTabMes').className = 'chip' + (t === 'mes' ? ' sel' : '');
-  document.getElementById('fumTabCampo').className = 'chip' + (t === 'campo' ? ' sel' : '');
+  document.getElementById('fumTabMes').className = 'tab' + (t === 'mes' ? ' active' : '');
+  document.getElementById('fumTabCampo').className = 'tab' + (t === 'campo' ? ' active' : '');
   fumPintar();
 }
 
 function fumPintarZonas() {
-  var c = document.getElementById('fumChipsZona');
+  var c = document.getElementById('fumZonas');
   c.innerHTML = '';
   ['todas', 'Sur', 'Norte'].forEach(function (z) {
     var b = document.createElement('button');
     b.type = 'button';
-    b.className = 'chip' + (z === fumZona ? ' sel' : '');
+    b.className = 'zona-btn' + (z === fumZona ? ' active' : '');
     b.textContent = z === 'todas' ? 'Todas' : z;
     b.onclick = function () { fumZona = z; fumCampoSel = null; fumPintarZonas(); fumPintar(); };
     c.appendChild(b);
@@ -1464,27 +1549,31 @@ function fumPintarMes() {
   grupos.forEach(function (g) { has += g.superficie; campos[g.campo] = 1; });
 
   var html =
-    '<div class="camBarra">' +
-      '<div class="camMes">' +
-        '<button class="camMesBtn" onclick="fumCambiarMes(-1)">‹</button>' +
-        '<span>' + FUM_MESES[fumMes] + ' ' + fumAnio + '</span>' +
-        '<button class="camMesBtn" onclick="fumCambiarMes(1)">›</button>' +
-      '</div>' +
+    '<div class="month-nav">' +
+      '<button class="month-btn" onclick="fumCambiarMes(-1)">‹</button>' +
+      '<div class="month-label">' + FUM_MESES[fumMes] + ' ' + fumAnio + '</div>' +
+      '<button class="month-btn" onclick="fumCambiarMes(1)">›</button>' +
     '</div>' +
-    '<div class="fumStats">' +
-      '<div class="fumStat"><b>' + has.toLocaleString('es-AR', { maximumFractionDigits:0 }) + '</b><span>Hectáreas</span></div>' +
-      '<div class="fumStat"><b>' + grupos.length + '</b><span>Aplicaciones</span></div>' +
-      '<div class="fumStat"><b>' + Object.keys(campos).length + '</b><span>Campos</span></div>' +
+    '<div class="stats-bar">' +
+      '<div class="stat-card"><div class="stat-num">' +
+        has.toLocaleString('es-AR', { maximumFractionDigits:0 }) +
+        '</div><div class="stat-label">Hectáreas</div></div>' +
+      '<div class="stat-card"><div class="stat-num">' + grupos.length +
+        '</div><div class="stat-label">Aplicaciones</div></div>' +
+      '<div class="stat-card"><div class="stat-num">' + Object.keys(campos).length +
+        '</div><div class="stat-label">Campos</div></div>' +
     '</div>' +
     fumStatsOperadores(grupos);
 
   if (!grupos.length) {
-    html += '<div class="item">No hay aplicaciones en ' + FUM_MESES[fumMes] + ' ' + fumAnio + '.</div>';
+    html += '<div class="empty-state"><div class="empty-icon">🌾</div>' +
+            '<div class="empty-text">No hay aplicaciones en<br>' +
+            FUM_MESES[fumMes] + ' ' + fumAnio + '</div></div>';
   } else {
     var dia = '';
     grupos.forEach(function (g) {
       var etiqueta = g.fecha.getDate() + ' de ' + FUM_MESES[g.fecha.getMonth()];
-      if (etiqueta !== dia) { dia = etiqueta; html += '<div class="camDia">' + etiqueta + '</div>'; }
+      if (etiqueta !== dia) { dia = etiqueta; html += '<div class="section-header">' + etiqueta + '</div>'; }
       html += fumTarjeta(g);
     });
   }
@@ -1498,11 +1587,12 @@ function fumPintarCampos() {
     var nombres = [], visto = {};
     filas.forEach(function (r) { if (r.campo && !visto[r.campo]) { visto[r.campo] = 1; nombres.push(r.campo); } });
     nombres.sort();
-    var h = '<div class="fumCampos">';
+    var h = '<div class="campo-grid">';
     nombres.forEach(function (n) {
       var cuantas = fumAgrupar(filas.filter(function (r) { return r.campo === n; })).length;
-      h += '<div class="fumCampo" onclick="fumElegirCampo(\'' + fumAttr_(n) + '\')">' +
-             '<b>' + escHtml_(n) + '</b><span>' + cuantas + ' aplic.</span></div>';
+      h += '<div class="campo-chip" onclick="fumElegirCampo(\'' + fumAttr_(n) + '\')">' +
+             '<div class="campo-chip-name">' + escHtml_(n) + '</div>' +
+             '<div class="campo-chip-count">' + cuantas + ' aplic.</div></div>';
     });
     h += '</div>';
     document.getElementById('fumContenido').innerHTML = h;
@@ -1514,17 +1604,19 @@ function fumPintarCampos() {
   grupos.forEach(function (g) { has += g.superficie; });
 
   var html =
-    '<button class="volver" onclick="fumElegirCampo(null)">‹ Todos los campos</button>' +
-    '<div class="seccion-tit">' + escHtml_(fumCampoSel) + '</div>' +
-    '<div class="fumStats dos">' +
-      '<div class="fumStat"><b>' + has.toLocaleString('es-AR', { maximumFractionDigits:0 }) + '</b><span>Has. totales</span></div>' +
-      '<div class="fumStat"><b>' + grupos.length + '</b><span>Aplicaciones</span></div>' +
+    '<button class="back-btn" onclick="fumElegirCampo(null)">← Todos los campos</button>' +
+    '<div class="stats-bar dos">' +
+      '<div class="stat-card"><div class="stat-num">' +
+        has.toLocaleString('es-AR', { maximumFractionDigits:0 }) +
+        '</div><div class="stat-label">Has. totales</div></div>' +
+      '<div class="stat-card"><div class="stat-num">' + grupos.length +
+        '</div><div class="stat-label">Aplicaciones</div></div>' +
     '</div>';
 
   var mes = '';
   grupos.forEach(function (g) {
     var etiqueta = FUM_MESES[g.fecha.getMonth()] + ' ' + g.fecha.getFullYear();
-    if (etiqueta !== mes) { mes = etiqueta; html += '<div class="camDia">' + etiqueta + '</div>'; }
+    if (etiqueta !== mes) { mes = etiqueta; html += '<div class="section-header">' + etiqueta + '</div>'; }
     html += fumTarjeta(g);
   });
   document.getElementById('fumContenido').innerHTML = html;
@@ -1544,32 +1636,38 @@ function fumStatsOperadores(grupos) {
   FUM_OPERADORES.forEach(function (o) {
     if (acum[o.valor] > 0) {
       hayAlguno = true;
-      filas += '<div class="fila"><span>' + o.largo + '</span><b>' +
-               acum[o.valor].toLocaleString('es-AR') + ' has</b></div>';
+      filas += '<div class="op-stat-row"><span class="op-stat-name">' + o.largo +
+               '</span><span class="op-stat-has">' + acum[o.valor].toLocaleString('es-AR') + ' has</span></div>';
     }
   });
   if (acum['Sin cargar'] > 0) {
-    filas += '<div class="fila" style="color:var(--muted)"><span>Sin cargar</span><b>' +
-             acum['Sin cargar'].toLocaleString('es-AR') + ' has</b></div>';
+    filas += '<div class="op-stat-row"><span class="op-stat-name" style="color:var(--text3)">Sin cargar</span>' +
+             '<span class="op-stat-has" style="color:var(--text3)">' +
+             acum['Sin cargar'].toLocaleString('es-AR') + ' has</span></div>';
   }
 
-  if (!hayAlguno && acum['Sin cargar'] === 0) return '';
-  return '<div class="fumOps"><div class="tit">¿Quién fumigó?</div>' +
-         (hayAlguno ? filas : filas + '<div class="fila" style="color:var(--muted)"><span>Todavía no hay operadores cargados</span></div>') +
-         '</div>';
+  if (!hayAlguno) {
+    return '<div class="op-stats"><div class="op-stats-title">¿Quién fumigó este mes?</div>' +
+           (filas || '') +
+           '<div class="op-stat-empty">Todavía no hay operadores cargados</div></div>';
+  }
+  return '<div class="op-stats"><div class="op-stats-title">Operadores — este mes</div>' + filas + '</div>';
 }
 
 function fumTarjeta(g) {
-  var dia = String(g.fecha.getDate()).padStart(2, '0') + ' ' + FUM_MESES_CORTO[g.fecha.getMonth()];
-  var lote = (g.lote && g.lote !== '1') ? ' · Lote ' + escHtml_(g.lote) : '';
+  var dia = String(g.fecha.getDate()).padStart(2, '0');
+  var mes = FUM_MESES_CORTO[g.fecha.getMonth()];
+  var lote = (g.lote && g.lote !== '1') ? 'Lote ' + escHtml_(g.lote) : '';
   var n = g.productos.length;
 
   var productos = g.productos.map(function (p) {
-    return '<div class="fumProd" data-fila="' + fumAttr_(p.fila) + '" data-id="' + fumAttr_(g.id) + '" ' +
-             'data-nombre="' + fumAttr_(p.nombre) + '" data-cantidad="' + fumAttr_(p.cantidad || 0) + '" ' +
-             'onclick="fumEditarProducto(this)">' +
-             '<span>' + escHtml_(p.nombre) + '</span>' +
-             '<span class="cant">' + (p.cantidad > 0 ? p.cantidad.toLocaleString('es-AR') : '') + ' ✎</span>' +
+    return '<div class="product-row" data-fila="' + fumAttr_(p.fila) + '" data-id="' + fumAttr_(g.id) + '" ' +
+             'data-nombre="' + fumAttr_(p.nombre) + '" data-cantidad="' + fumAttr_(p.cantidad || 0) + '">' +
+             '<div class="product-view" onclick="fumEditarProducto(this.parentElement)">' +
+               '<div class="product-name">' + escHtml_(p.nombre) + '</div>' +
+               '<div class="product-qty">' + (p.cantidad > 0 ? p.cantidad.toLocaleString('es-AR') : '') +
+               ' <span class="edit-icon">✎</span></div>' +
+             '</div>' +
            '</div>';
   }).join('');
 
@@ -1580,63 +1678,77 @@ function fumTarjeta(g) {
   var acciones = '';
   if (g.id) {
     acciones =
-      '<button class="btn chico fantasma" style="margin-top:8px" ' +
+      '<button class="edit-fecha-btn" ' +
         'data-id="' + fumAttr_(g.id) + '" data-fecha="' + fumAttr_(g.fechaStr) + '" ' +
         'data-campo="' + fumAttr_(g.campo) + '" data-lote="' + fumAttr_(g.lote) + '" ' +
         'data-zona="' + fumAttr_(g.zona || '') + '" data-superficie="' + fumAttr_(g.superficie || 0) + '" ' +
         'onclick="fumNuevoProducto(this)">+ Agregar producto</button>' +
-      '<button class="btn chico fantasma" style="margin-top:8px" ' +
-        'onclick="fumEditarFecha(this, \'' + fumAttr_(g.id) + '\', \'' + iso + '\')">✎ Corregir la fecha</button>' +
-      '<div class="seccion-tit" style="margin:14px 0 6px">¿Quién fumigó?</div>' +
-      '<div class="chips">' +
-        FUM_OPERADORES.map(function (o) {
-          return '<button class="chip' + (g.operador === o.valor ? ' sel' : '') + '" ' +
-                 'onclick="fumGuardarOperador(this, \'' + fumAttr_(g.id) + '\', \'' + o.valor + '\')">' +
-                 o.label + '</button>';
-        }).join('') +
+      '<button class="edit-fecha-btn" ' +
+        'onclick="fumEditarFecha(this, \'' + fumAttr_(g.id) + '\', \'' + iso + '\')">' +
+        '✎ Corregir fecha de aplicación</button>' +
+      '<div class="operador-section">' +
+        '<div class="operador-title">¿Quién fumigó?</div>' +
+        '<div class="operador-btns">' +
+          FUM_OPERADORES.map(function (o) {
+            return '<button class="op-btn' + (g.operador === o.valor ? ' selected' : '') + '" ' +
+                   'onclick="fumGuardarOperador(this, \'' + fumAttr_(g.id) + '\', \'' + o.valor + '\')">' +
+                   o.label + '</button>';
+          }).join('') +
+        '</div>' +
       '</div>';
   }
 
-  return '<div class="item">' +
-    '<div onclick="fumAbrir(this)">' +
-      '<div class="fila1"><span>' + dia + '</span><span>' + escHtml_(g.zona || '—') + '</span></div>' +
-      '<div class="titulo">' + escHtml_(g.campo) + lote + '</div>' +
-      '<div class="desc">' + g.superficie + ' has · ' + n + (n === 1 ? ' producto' : ' productos') + '</div>' +
+  return '<div class="app-card">' +
+    '<div class="card-main" onclick="fumAbrir(this)">' +
+      '<div class="card-date-block">' +
+        '<div class="card-day">' + dia + '</div>' +
+        '<div class="card-month-short">' + mes + '</div>' +
+      '</div>' +
+      '<div class="card-info">' +
+        '<div class="card-campo">' + escHtml_(g.campo) + '</div>' +
+        (lote ? '<div class="card-lote">' + lote + '</div>' : '') +
+        '<div class="card-tags">' +
+          '<span class="tag tag-has">' + g.superficie + ' has</span>' +
+          '<span class="tag tag-zona">' + escHtml_(g.zona || '—') + '</span>' +
+          '<span class="tag tag-prod">' + n + (n === 1 ? ' producto' : ' productos') + '</span>' +
+        '</div>' +
+      '</div>' +
     '</div>' +
-    '<div class="fumDet">' +
-      '<div class="seccion-tit" style="margin:6px 0">Productos aplicados</div>' +
+    '<div class="card-detail">' +
+      '<div class="detail-title">Productos aplicados</div>' +
       productos + acciones +
     '</div>' +
   '</div>';
 }
 
-function fumAbrir(el) { el.parentElement.classList.toggle('abierta'); }
+function fumAbrir(el) { el.parentElement.classList.toggle('expanded'); }
 
 /* ---------- correcciones ---------- */
 function fumEditarFecha(btn, id, iso) {
-  if (btn.parentElement.querySelector('.fumEditorFecha')) return;
+  if (btn.parentElement.querySelector('.fumEdFecha')) return;
   var d = document.createElement('div');
-  d.className = 'fumEditor fumEditorFecha';
-  d.innerHTML = '<input type="date" value="' + iso + '">' +
-                '<button class="ok">✓</button><button class="no">✕</button>';
-  d.querySelector('.no').onclick = function () { d.remove(); };
-  d.querySelector('.ok').onclick = function () {
+  d.className = 'fecha-editor fumEdFecha';
+  d.innerHTML = '<input type="date" class="fecha-input" value="' + iso + '">' +
+                '<button class="fecha-save-btn">✓</button>' +
+                '<button class="fecha-cancel-btn">✕</button>';
+  d.onclick = function (e) { e.stopPropagation(); };
+  d.querySelector('.fecha-cancel-btn').onclick = function () { d.remove(); };
+  d.querySelector('.fecha-save-btn').onclick = function () {
     var v = d.querySelector('input').value;
     if (!v) return;
     var p = v.split('-');
     this.textContent = '...';
-    fumMandar({ id: id, fechaNueva: p[2] + '/' + p[1] + '/' + p[0] },
-              'Fecha corregida ✓', d);
+    fumMandar({ id: id, fechaNueva: p[2] + '/' + p[1] + '/' + p[0] }, 'Fecha corregida ✓', d);
   };
   btn.parentElement.insertBefore(d, btn.nextSibling);
 }
 
 function fumGuardarOperador(btn, id, operador) {
-  var yaEstaba = btn.classList.contains('sel');
+  var yaEstaba = btn.classList.contains('selected');
   var valor = yaEstaba ? '' : operador;   // tocar el que ya estaba lo saca
-  var chips = btn.parentElement.querySelectorAll('.chip');
-  for (var i = 0; i < chips.length; i++) chips[i].classList.remove('sel');
-  if (!yaEstaba) btn.classList.add('sel');
+  var otros = btn.parentElement.querySelectorAll('.op-btn');
+  for (var i = 0; i < otros.length; i++) otros[i].classList.remove('selected');
+  if (!yaEstaba) btn.classList.add('selected');
 
   fumDatos.forEach(function (r) {
     if (r.id && r.id.toLowerCase() === String(id).toLowerCase()) r.operador = valor;
@@ -1645,7 +1757,7 @@ function fumGuardarOperador(btn, id, operador) {
 }
 
 function fumEditarProducto(fila) {
-  if (fila.querySelector('.fumEditor')) return;
+  if (fila.querySelector('.fecha-editor')) return;
   var nombre = fila.dataset.nombre || '';
   var cant = parseFloat(fila.dataset.cantidad) || 0;
   var nroFila = fila.dataset.fila;
@@ -1653,26 +1765,33 @@ function fumEditarProducto(fila) {
 
   if (!nroFila) { mostrarToast('Esa fila no tiene número. Actualizá y probá de nuevo.'); return; }
 
+  var vista = fila.querySelector('.product-view');
+  vista.style.display = 'none';
+
   var d = document.createElement('div');
-  d.className = 'fumEditor';
-  d.innerHTML = '<input type="text" style="flex:2" value="' + fumAttr_(nombre) + '" placeholder="Producto">' +
-                '<input type="text" style="flex:1" value="' + (cant > 0 ? cant : '') + '" placeholder="Cant.">' +
-                '<button class="ok">✓</button><button class="no">✕</button>';
-  d.onclick = function (e) { e.stopPropagation(); };   // el click no debe plegar la tarjeta
-  d.querySelector('.no').onclick = function () { d.remove(); };
-  d.querySelector('.ok').onclick = function () {
+  d.className = 'fecha-editor';
+  d.innerHTML = '<input type="text" class="fecha-input" style="flex:2" value="' + fumAttr_(nombre) + '" placeholder="Producto">' +
+                '<input type="text" class="fecha-input" style="flex:1" value="' + (cant > 0 ? cant : '') + '" placeholder="Cant.">' +
+                '<button class="fecha-save-btn">✓</button>' +
+                '<button class="fecha-cancel-btn">✕</button>';
+  d.onclick = function (e) { e.stopPropagation(); };
+  d.querySelector('.fecha-cancel-btn').onclick = function () { d.remove(); vista.style.display = 'flex'; };
+  d.querySelector('.fecha-save-btn').onclick = function () {
     var ins = d.querySelectorAll('input');
     var nuevo = ins[0].value.trim();
     var cantNueva = parseFloat(ins[1].value.trim().replace(',', '.')) || 0;
     if (!nuevo) { mostrarToast('El producto no puede quedar vacío'); return; }
     this.textContent = '...';
+
     fila.dataset.nombre = nuevo;
     fila.dataset.cantidad = cantNueva;
-    fila.querySelector('span').textContent = nuevo;
-    fila.querySelector('.cant').textContent = (cantNueva > 0 ? cantNueva.toLocaleString('es-AR') : '') + ' ✎';
+    fila.querySelector('.product-name').textContent = nuevo;
+    fila.querySelector('.product-qty').innerHTML =
+      (cantNueva > 0 ? cantNueva.toLocaleString('es-AR') : '') + ' <span class="edit-icon">✎</span>';
     fumDatos.forEach(function (r) {
       if (String(r.fila) === String(nroFila)) { r.insumo = nuevo; r.cantidad = cantNueva; }
     });
+    vista.style.display = 'flex';
     fumMandar({ id: id, fila: nroFila, nombreNuevo: nuevo, cantidadNueva: cantNueva },
               'Producto corregido ✓', d);
   };
@@ -1680,14 +1799,16 @@ function fumEditarProducto(fila) {
 }
 
 function fumNuevoProducto(btn) {
-  if (btn.parentElement.querySelector('.fumEditorNuevo')) return;
+  if (btn.parentElement.querySelector('.fumEdNuevo')) return;
   var d = document.createElement('div');
-  d.className = 'fumEditor fumEditorNuevo';
-  d.innerHTML = '<input type="text" style="flex:2" placeholder="Producto">' +
-                '<input type="text" style="flex:1" placeholder="Cant.">' +
-                '<button class="ok">✓</button><button class="no">✕</button>';
-  d.querySelector('.no').onclick = function () { d.remove(); };
-  d.querySelector('.ok').onclick = function () {
+  d.className = 'fecha-editor fumEdNuevo';
+  d.innerHTML = '<input type="text" class="fecha-input" style="flex:2" placeholder="Producto">' +
+                '<input type="text" class="fecha-input" style="flex:1" placeholder="Cant.">' +
+                '<button class="fecha-save-btn">✓</button>' +
+                '<button class="fecha-cancel-btn">✕</button>';
+  d.onclick = function (e) { e.stopPropagation(); };
+  d.querySelector('.fecha-cancel-btn').onclick = function () { d.remove(); };
+  d.querySelector('.fecha-save-btn').onclick = function () {
     var ins = d.querySelectorAll('input');
     var nombre = ins[0].value.trim();
     if (!nombre) { mostrarToast('Poné el nombre del producto'); return; }
@@ -1736,10 +1857,10 @@ function fumNuevoTrabajo() {
 function fumNtAgregarFila() {
   var cont = document.getElementById('fumNtProductos');
   var d = document.createElement('div');
-  d.className = 'fumProdNuevo';
-  d.innerHTML = '<input type="text" style="flex:2" placeholder="Producto">' +
-                '<input type="text" style="flex:1" placeholder="Cant.">' +
-                '<button type="button">✕</button>';
+  d.className = 'producto-input-row';
+  d.innerHTML = '<input type="text" class="fecha-input" style="flex:2" placeholder="Producto">' +
+                '<input type="text" class="fecha-input" style="flex:1" placeholder="Cant.">' +
+                '<button type="button" class="fecha-cancel-btn">✕</button>';
   d.querySelector('button').onclick = function () { d.remove(); };
   cont.appendChild(d);
 }
@@ -1750,7 +1871,7 @@ function fumNtPintarOperadores() {
   FUM_OPERADORES.forEach(function (o) {
     var b = document.createElement('button');
     b.type = 'button';
-    b.className = 'chip' + (fumOperadorNuevo === o.valor ? ' sel' : '');
+    b.className = 'op-btn' + (fumOperadorNuevo === o.valor ? ' selected' : '');
     b.textContent = o.label;
     b.onclick = function () {
       fumOperadorNuevo = (fumOperadorNuevo === o.valor) ? '' : o.valor;
@@ -1842,10 +1963,10 @@ var CAM_MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio',
    viene escribiendo "Reparacion" sin tilde desde el arranque); "label" es
    solo lo que se muestra. */
 var CAM_TIPOS = [
-  { nombre:'Viaje',         label:'Viaje',       corto:'Viaje',      ico:'🌾', pill:'cat-log' },
-  { nombre:'Combustible',   label:'Combustible', corto:'Gasoil',     ico:'⛽', pill:'cat-rep' },
-  { nombre:'Reparacion',    label:'Reparación',  corto:'Arreglo',    ico:'🔧', pill:'cat-gan' },
-  { nombre:'Mantenimiento', label:'Mantenimiento', corto:'Service',  ico:'🔩', pill:'cat-lab' }
+  { nombre:'Viaje',         label:'Viaje',         corto:'Viaje',   ico:'🌾', cls:'tv', badge:'bv' },
+  { nombre:'Combustible',   label:'Combustible',   corto:'Gasoil',  ico:'⛽', cls:'tc', badge:'bc' },
+  { nombre:'Reparacion',    label:'Reparación',    corto:'Arreglo', ico:'🔧', cls:'tr', badge:'br' },
+  { nombre:'Mantenimiento', label:'Mantenimiento', corto:'Service', ico:'🔩', cls:'tm', badge:'bm' }
 ];
 
 function camLabel_(tipo) {
@@ -1958,7 +2079,7 @@ function camPintar() {
   var cont = document.getElementById('camLista');
   var regs = camDelMes();
   if (!regs.length) {
-    cont.innerHTML = '<div class="item">Sin novedades en ' + CAM_MESES[camMes] + '.</div>';
+    cont.innerHTML = '<div class="vacio">📋<br>Sin novedades en ' + CAM_MESES[camMes] + '</div>';
     return;
   }
 
@@ -1967,7 +2088,7 @@ function camPintar() {
     if (r.fecha !== diaAnterior) {
       diaAnterior = r.fecha;
       var d = camFecha_(r.fecha);
-      html += '<div class="camDia">' +
+      html += '<div class="day-label">' +
               (d ? d.toLocaleDateString('es-AR', { weekday:'long', day:'numeric', month:'long' }) : r.fecha) +
               '</div>';
     }
@@ -1978,7 +2099,7 @@ function camPintar() {
 
 function camTarjeta(r) {
   var t = CAM_TIPOS.filter(function (x) { return x.nombre === r.tipo; })[0] ||
-          { ico:'📋', pill:'cat-otros' };
+          { ico:'📋', cls:'', badge:'' };
   var titulo = r.tipo, detalle = '';
 
   if (r.tipo === 'Viaje') {
@@ -1987,7 +2108,7 @@ function camTarjeta(r) {
                +r.kilos ? (+r.kilos / 1000).toFixed(1) + ' tn' : '',
                r.kms_rec ? r.kms_rec + ' km' : ''].filter(Boolean).join(' · ');
   } else if (r.tipo === 'Combustible') {
-    titulo = 'Carga de gasoil';
+    titulo = 'Carga combustible';
     detalle = [r.litros ? r.litros + ' L' : '', r.proveedor].filter(Boolean).join(' · ');
   } else if (r.tipo === 'Reparacion') {
     titulo = r.actividad || 'Reparación';
@@ -1996,18 +2117,21 @@ function camTarjeta(r) {
     titulo = r.actividad || 'Mantenimiento';
   }
 
-  return '<div class="item">' +
-    '<div class="fila1">' +
-      '<span>' + t.ico + ' <span class="cat-pill ' + t.pill + '">' + escHtml_(camLabel_(r.tipo)) + '</span></span>' +
-      '<span>' + (r.km_camion ? (+r.km_camion).toLocaleString('es-AR') + ' km' : '') + '</span>' +
+  return '<div class="record-card ' + t.cls + '">' +
+    '<div class="rec-icon">' + t.ico + '</div>' +
+    '<div class="rec-info">' +
+      '<div class="rec-title">' + escHtml_(titulo) + '</div>' +
+      (detalle ? '<div class="rec-detail">' + escHtml_(detalle) + '</div>' : '') +
+      (r.carta_porte ? '<div class="rec-carta">CP: ' + escHtml_(r.carta_porte) + '</div>' : '') +
+      (r.observaciones ? '<div class="rec-obs">' + escHtml_(r.observaciones) + '</div>' : '') +
+      '<span class="badge ' + t.badge + '">' + escHtml_(camLabel_(r.tipo)) + '</span>' +
+      '<div class="card-actions">' +
+        '<button class="btn-edit" onclick="camEditar(\'' + escHtml_(r.id) + '\')">✏ Editar</button>' +
+        '<button class="btn-del" onclick="camBorrar(\'' + escHtml_(r.id) + '\')">✕ Borrar</button>' +
+      '</div>' +
     '</div>' +
-    '<div class="titulo">' + escHtml_(titulo) + '</div>' +
-    (detalle ? '<div class="desc">' + escHtml_(detalle) + '</div>' : '') +
-    (r.carta_porte ? '<div class="desc">CP: ' + escHtml_(r.carta_porte) + '</div>' : '') +
-    (r.observaciones ? '<div class="desc">' + escHtml_(r.observaciones) + '</div>' : '') +
-    '<div class="camAcc">' +
-      '<button class="btn chico fantasma" onclick="camEditar(\'' + escHtml_(r.id) + '\')">Editar</button>' +
-      '<button class="btn chico fantasma" onclick="camBorrar(\'' + escHtml_(r.id) + '\')">Borrar</button>' +
+    '<div class="rec-meta">' +
+      (r.km_camion ? '<div class="rec-km">' + (+r.km_camion).toLocaleString('es-AR') + ' km</div>' : '') +
     '</div>' +
   '</div>';
 }
@@ -2023,10 +2147,10 @@ function camChips() {
   var c = document.getElementById('camChipsTipo');
   c.innerHTML = '';
   CAM_TIPOS.forEach(function (t) {
-    var b = document.createElement('button');
-    b.type = 'button';
-    b.className = 'chip' + (t.nombre === camTipoSel ? ' sel' : '');
-    b.innerHTML = '<span class="ic">' + t.ico + '</span>' + t.corto;
+    var b = document.createElement('div');
+    b.className = 'type-btn' + (t.nombre === camTipoSel ? ' active' : '');
+    b.innerHTML = '<span class="t-icon">' + t.ico + '</span>' +
+                  '<span class="t-label">' + t.corto + '</span>';
     b.onclick = function () { camElegirTipo(t.nombre); };
     c.appendChild(b);
   });
