@@ -615,17 +615,23 @@ var GANADERIA_BACKEND = 'https://script.google.com/macros/s/AKfycby0vYipnm6pAt5E
  * esconderlo: esta lista está a la vista en el código, que es un repo
  * público. Como no habilita nada, da igual.
  *
- * Esto NO esconde nada: solo cambia el orden de los cuadrados del inicio,
- * para que cada uno tenga arriba lo que usa todos los días. Si alguien entra
- * con el link de otro, lo único que ve es otro orden. Cuando haga falta traba
- * de verdad, va PIN como en Ganadería.
+ * Cada uno tiene su orden (lo que usa todos los días, arriba) y lo que no le
+ * toca directamente no se le muestra. Ojo: esto ordena la pantalla, no es una
+ * traba — el que entra con el link de otro ve lo del otro. Cuando haga falta
+ * traba de verdad, va PIN como en Ganadería.
  */
 var PERSONAS = {
-  'jkzw4k3': { nombre:'Pato',   orden:['camion', 'remitos'] },
-  't46cbl2': { nombre:'Lalo',   orden:['fumigacion'] },
-  'cmf8i6a': { nombre:'Lucio',  orden:[] },
-  'bcuiltt': { nombre:'Daniel', orden:[] }
+  'jkzw4k3': { nombre:'Pato',   orden:['camion', 'remitos'], oculta:['fumigacion'] },
+  't46cbl2': { nombre:'Lalo',   orden:['fumigacion'],        oculta:['camion'] },
+  'cmf8i6a': { nombre:'Lucio',  orden:[],                    oculta:[] },
+  'bcuiltt': { nombre:'Daniel', orden:[],                    oculta:[] }
 };
+
+/** Lo que no le toca a la persona que está usando la app. */
+function ocultoPara_(vista) {
+  var p = PERSONAS[quienEs_()];
+  return !!(p && p.oculta && p.oculta.indexOf(vista) >= 0);
+}
 
 /* Todos los cuadrados, en el orden de fábrica. Si se agrega uno nuevo, va acá
    también, si no queda antes de los ordenados. */
@@ -655,7 +661,9 @@ function ordenarInicio() {
     if (puestos[v]) return;
     puestos[v] = 1;
     var t = grid.querySelector('[data-vista="' + v + '"]');
-    if (t) grid.appendChild(t);   // reubicar al final, uno por uno, da el orden final
+    if (!t) return;
+    grid.appendChild(t);   // reubicar al final, uno por uno, da el orden final
+    t.classList.toggle('oculto', !!(p && p.oculta && p.oculta.indexOf(v) >= 0));
   });
 }
 
@@ -685,6 +693,9 @@ document.addEventListener('DOMContentLoaded', function () {
 var VISTAS = ['home', 'combustible', 'remitos', 'tareas', 'planilla', 'camion', 'fumigacion'];
 
 function ir(vista) {
+  // por si se llega de otra forma que no sea tocando el cuadrado
+  if (ocultoPara_(vista)) vista = 'home';
+
   VISTAS.forEach(function (v) {
     document.getElementById('v' + capitaliza_(v)).classList.add('oculto');
   });
