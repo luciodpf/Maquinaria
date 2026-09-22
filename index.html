@@ -829,10 +829,15 @@ function quienEs_() {
   var u = '';
   try {
     var m = location.search.match(/[?&]u=([^&]*)/);
-    if (m) u = decodeURIComponent(m[1]).toLowerCase().trim();
-    // el link siempre manda: alcanza con volver a mandarlo para corregir un teléfono
-    if (u) localStorage.setItem('maqQuien', u);
-    else u = (localStorage.getItem('maqQuien') || '').toLowerCase().trim();
+    if (m) {
+      // si el link trae ?u=, manda siempre. Uno vacío o desconocido borra lo
+      // guardado: …/Maquinaria/?u= devuelve el teléfono a la vista de fábrica.
+      u = decodeURIComponent(m[1]).toLowerCase().trim();
+      if (PERSONAS[u]) localStorage.setItem('maqQuien', u);
+      else { localStorage.removeItem('maqQuien'); u = ''; }
+    } else {
+      u = (localStorage.getItem('maqQuien') || '').toLowerCase().trim();
+    }
   } catch (e) {}
   return PERSONAS[u] ? u : '';
 }
@@ -840,7 +845,17 @@ function quienEs_() {
 function ordenarInicio() {
   var clave = quienEs_();
   var p = PERSONAS[clave];
-  document.getElementById('quienSoy').textContent = p ? p.nombre : '';
+
+  // el nombre de arriba a la derecha sirve para salir: si no, el aparato queda
+  // pegado a la última persona que se probó en él
+  var etiqueta = document.getElementById('quienSoy');
+  etiqueta.textContent = p ? p.nombre : '';
+  etiqueta.style.cursor = p ? 'pointer' : '';
+  etiqueta.onclick = p ? function () {
+    if (!confirm('¿Salir de la vista de ' + p.nombre + '?')) return;
+    try { localStorage.removeItem('maqQuien'); } catch (e) {}
+    location.href = location.pathname;
+  } : null;
 
   var grid = document.getElementById('gridInicio');
   var orden = (p ? p.orden : []).concat(ORDEN_BASE);
