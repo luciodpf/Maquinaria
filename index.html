@@ -24,6 +24,7 @@
     display:flex;align-items:center;justify-content:space-between;
     position:sticky;top:0;z-index:10;}
   header h1{font-size:18px;margin:0;font-weight:700;}
+  header #quienSoy{font-size:12px;opacity:.75;}
   main{max-width:520px;margin:0 auto;padding:16px;}
   .oculto{display:none !important;}
 
@@ -53,7 +54,8 @@
   .campo{margin-bottom:16px;}
   .campo label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px;
     font-weight:600;}
-  .campo input[type=text], .campo input[type=number], .campo textarea, .campo select{
+  .campo input[type=text], .campo input[type=number], .campo input[type=date],
+  .campo textarea, .campo select{
     width:100%;padding:14px;border:1px solid var(--borde);border-radius:10px;
     font-size:16px;background:#fff;}
   .campo textarea{min-height:80px;resize:vertical;}
@@ -119,6 +121,26 @@
     border-radius:14px;padding:16px;text-align:center;font-weight:700;margin-bottom:16px;
     font-size:14px;}
 
+  /* camion */
+  .camBarra{display:flex;align-items:center;justify-content:space-between;gap:10px;
+    background:var(--panel);border:1px solid var(--borde);border-radius:12px;
+    padding:8px 10px;margin-bottom:12px;}
+  .camMes{display:flex;align-items:center;gap:6px;font-weight:700;font-size:14px;}
+  .camMesBtn{background:var(--bg);border:1px solid var(--borde);border-radius:8px;
+    width:30px;height:30px;font-size:17px;color:var(--ink);line-height:1;}
+  .camKm{text-align:right;line-height:1.25;}
+  .camKm b{display:block;font-size:14px;color:var(--accent2);}
+  .camKm span{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;}
+  .camTipos{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;}
+  .camTipos .chip{border-radius:10px;text-align:center;padding:10px 2px;font-size:11px;}
+  .camTipos .chip .ic{display:block;font-size:19px;margin-bottom:3px;}
+  /* el KM y los kilos no necesitan el numero gigante de las cargas de gasoil */
+  .campo.chico input[type=number]{font-size:16px;font-weight:400;text-align:left;}
+  .camDia{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;
+    letter-spacing:.03em;margin:16px 0 6px;}
+  .camAcc{display:flex;gap:8px;margin-top:8px;}
+  .camAcc .btn{margin-bottom:0;}
+
   /* planilla de remitos: filas tipo Excel, sin fotos */
   .tablaWrap{overflow-x:auto;-webkit-overflow-scrolling:touch;background:var(--panel);
     border:1px solid var(--borde);border-radius:12px;}
@@ -149,20 +171,24 @@
 
 <header>
   <h1>🔧 Maquinaria</h1>
+  <span id="quienSoy"></span>
 </header>
 
 <main>
 
   <!-- ===================== HOME ===================== -->
   <section id="vHome">
-    <div class="grid2">
-      <div class="tarjeta" onclick="ir('remitos')">
+    <div class="grid2" id="gridInicio">
+      <div class="tarjeta" data-vista="remitos" onclick="ir('remitos')">
         <div class="ico">🧾</div>Remitos<small>sacale foto y subilo</small>
       </div>
-      <div class="tarjeta" onclick="ir('tareas')">
+      <div class="tarjeta" data-vista="tareas" onclick="ir('tareas')">
         <div class="ico">✅</div>Tareas<small id="contTareas">a hacer y hechas</small>
       </div>
-      <div class="tarjeta" onclick="ir('combustible')">
+      <div class="tarjeta" data-vista="camion" onclick="ir('camion')">
+        <div class="ico">🚛</div>Camión<small>viajes, gasoil, service</small>
+      </div>
+      <div class="tarjeta" data-vista="combustible" onclick="ir('combustible')">
         <div class="ico">⛽</div>Combustible<small>cargar o llegada al galpón</small>
       </div>
     </div>
@@ -262,6 +288,135 @@
     <div class="planPie">Tocá una fila para ver el detalle completo.</div>
   </section>
 
+  <!-- ===================== CAMIÓN =====================
+       Vive en su propia planilla y su propio Apps Script, los mismos que usa
+       la app suelta de Pato (luciodpf.github.io/Camion). Las dos pueden
+       convivir: esto es otra puerta a la misma planilla, no una copia. -->
+  <section id="vCamion" class="oculto">
+
+    <div id="camPaso1">
+      <button class="volver" onclick="ir('home')">‹ Volver</button>
+
+      <div class="camBarra">
+        <div class="camMes">
+          <button class="camMesBtn" onclick="camCambiarMes(-1)">‹</button>
+          <span id="camMesLabel">—</span>
+          <button class="camMesBtn" onclick="camCambiarMes(1)">›</button>
+        </div>
+        <div class="camKm">
+          <span>Último KM</span>
+          <b id="camUltimoKm">—</b>
+        </div>
+      </div>
+
+      <button class="btn grande verde" onclick="camNueva()">+ Nueva novedad</button>
+
+      <div class="lista" id="camLista"></div>
+    </div>
+
+    <div id="camPaso2" class="oculto">
+      <button class="volver" onclick="camVolverLista()">‹ Volver</button>
+      <p style="font-weight:700;font-size:16px;" id="camTituloForm">Nueva novedad</p>
+
+      <div class="row" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div class="campo chico">
+          <label>Fecha</label>
+          <input type="date" id="camFecha">
+        </div>
+        <div class="campo chico">
+          <label>KM del camión</label>
+          <input type="number" id="camKmCamion" inputmode="numeric" placeholder="0">
+        </div>
+      </div>
+
+      <div class="campo">
+        <label>¿Qué pasó?</label>
+        <div class="camTipos" id="camChipsTipo"></div>
+      </div>
+
+      <div id="camCampos-Viaje">
+        <div class="campo chico">
+          <label>Origen</label>
+          <input type="text" id="camOrigen" list="camDlOrigen" placeholder="Ej: AFA">
+          <datalist id="camDlOrigen"></datalist>
+        </div>
+        <div class="campo chico">
+          <label>Destino</label>
+          <input type="text" id="camDestino" list="camDlDestino" placeholder="Ej: Renova">
+          <datalist id="camDlDestino"></datalist>
+        </div>
+        <div class="campo chico">
+          <label>KMs recorridos</label>
+          <input type="number" id="camKmsRec" inputmode="numeric" placeholder="0">
+        </div>
+        <div class="campo chico">
+          <label>Especie</label>
+          <input type="text" id="camEspecie" list="camDlEspecies" placeholder="Ej: Soja">
+          <datalist id="camDlEspecies">
+            <option value="Soja"><option value="Maíz"><option value="Girasol"><option value="Trigo"><option value="Sorgo">
+          </datalist>
+        </div>
+        <div class="campo chico">
+          <label>Kilos</label>
+          <input type="number" id="camKilos" inputmode="numeric" placeholder="0">
+        </div>
+        <div class="campo chico">
+          <label>Carta de porte</label>
+          <input type="text" id="camCartaPorte" placeholder="Nro.">
+        </div>
+        <div class="campo">
+          <label>Observaciones</label>
+          <textarea id="camObs" placeholder="Alguna observación..."></textarea>
+        </div>
+      </div>
+
+      <div id="camCampos-Combustible" class="oculto">
+        <div class="campo chico">
+          <label>Litros</label>
+          <input type="number" id="camLitros" inputmode="decimal" placeholder="0">
+        </div>
+        <div class="campo chico">
+          <label>Proveedor</label>
+          <input type="text" id="camProvComb" list="camDlProveedores" placeholder="Ej: AFA">
+          <datalist id="camDlProveedores"></datalist>
+        </div>
+        <div class="campo">
+          <label>Observaciones</label>
+          <textarea id="camObsComb" placeholder="Alguna observación..."></textarea>
+        </div>
+      </div>
+
+      <div id="camCampos-Reparacion" class="oculto">
+        <div class="campo">
+          <label>¿Qué se reparó?</label>
+          <input type="text" id="camActRep" placeholder="Describí la reparación">
+        </div>
+        <div class="campo chico">
+          <label>Taller / proveedor</label>
+          <input type="text" id="camProvRep" placeholder="Nombre">
+        </div>
+        <div class="campo">
+          <label>Observaciones</label>
+          <textarea id="camObsRep" placeholder="Alguna observación..."></textarea>
+        </div>
+      </div>
+
+      <div id="camCampos-Mantenimiento" class="oculto">
+        <div class="campo">
+          <label>¿Qué se hizo?</label>
+          <input type="text" id="camActMant" placeholder="Describí el mantenimiento">
+        </div>
+        <div class="campo">
+          <label>Observaciones</label>
+          <textarea id="camObsMant" placeholder="Alguna observación..."></textarea>
+        </div>
+      </div>
+
+      <button class="btn grande" id="camBtnGuardar" onclick="camGuardar()">Guardar novedad</button>
+    </div>
+
+  </section>
+
   <!-- ===================== TAREAS ===================== -->
   <section id="vTareas" class="oculto">
 
@@ -351,6 +506,56 @@ function claseCategoria_(nombre) {
 // única función de solo lectura. Ver getReparacionesPublico() en su Codigo.gs.
 var GANADERIA_BACKEND = 'https://script.google.com/macros/s/AKfycby0vYipnm6pAt5EXKS3UUlCjORFrLe1FhbbFtq5Dt5EN778fW1VLuBYrPKwehvlXKRiBA/exec';
 
+/* ====================== QUIÉN ESTÁ USANDO ======================
+ *
+ * Sin contraseña: a cada uno se le manda su propio link (…/?u=pato) y el
+ * teléfono se lo acuerda. Hace falta guardarlo la primera vez porque al
+ * instalar la app Chrome abre el start_url del manifest y se come el ?u=.
+ *
+ * Esto NO esconde nada: solo cambia el orden de los cuadrados del inicio,
+ * para que cada uno tenga arriba lo que usa todos los días. Si alguien entra
+ * con el link de otro, lo único que ve es otro orden. Cuando haga falta traba
+ * de verdad, va PIN como en Ganadería.
+ */
+var PERSONAS = {
+  pato:   { nombre:'Pato',   orden:['camion', 'remitos'] },
+  lalo:   { nombre:'Lalo',   orden:['fumigacion'] },
+  lucio:  { nombre:'Lucio',  orden:[] },
+  daniel: { nombre:'Daniel', orden:[] }
+};
+
+/* Todos los cuadrados, en el orden de fábrica. Si se agrega uno nuevo, va acá
+   también, si no queda antes de los ordenados. */
+var ORDEN_BASE = ['remitos', 'tareas', 'camion', 'combustible'];
+
+function quienEs_() {
+  var u = '';
+  try {
+    var m = location.search.match(/[?&]u=([^&]*)/);
+    if (m) u = decodeURIComponent(m[1]).toLowerCase().trim();
+    // el link siempre manda: alcanza con volver a mandarlo para corregir un teléfono
+    if (u) localStorage.setItem('maqQuien', u);
+    else u = (localStorage.getItem('maqQuien') || '').toLowerCase().trim();
+  } catch (e) {}
+  return PERSONAS[u] ? u : '';
+}
+
+function ordenarInicio() {
+  var clave = quienEs_();
+  var p = PERSONAS[clave];
+  document.getElementById('quienSoy').textContent = p ? p.nombre : '';
+
+  var grid = document.getElementById('gridInicio');
+  var orden = (p ? p.orden : []).concat(ORDEN_BASE);
+  var puestos = {};
+  orden.forEach(function (v) {
+    if (puestos[v]) return;
+    puestos[v] = 1;
+    var t = grid.querySelector('[data-vista="' + v + '"]');
+    if (t) grid.appendChild(t);   // reubicar al final, uno por uno, da el orden final
+  });
+}
+
 /* ====================== ESTADO ====================== */
 var estado = {
   maquinas: [],
@@ -365,6 +570,7 @@ var estado = {
 
 /* ====================== ARRANQUE ====================== */
 document.addEventListener('DOMContentLoaded', function () {
+  ordenarInicio();
   ir('home');
   cargarMaquinas();
   if ('serviceWorker' in navigator) {
@@ -373,7 +579,7 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 /* ====================== NAVEGACIÓN ====================== */
-var VISTAS = ['home', 'combustible', 'remitos', 'tareas', 'planilla'];
+var VISTAS = ['home', 'combustible', 'remitos', 'tareas', 'planilla', 'camion'];
 
 function ir(vista) {
   VISTAS.forEach(function (v) {
@@ -385,6 +591,7 @@ function ir(vista) {
   if (vista === 'remitos') { cargarRemitos(); }
   if (vista === 'planilla') { cargarPlanilla(); }
   if (vista === 'tareas') { volverTarPaso1(); cargarTareas(); }
+  if (vista === 'camion') { camVolverLista(); camCargar(); }
 }
 
 function capitaliza_(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
@@ -858,6 +1065,366 @@ function borrarTareaUI(id) {
     mostrarToast('Borrada ✓');
     cargarTareas();
   }).catch(function (e) { mostrarToast('Error: ' + e.message); });
+}
+
+/* ====================== CAMIÓN ======================
+ *
+ * Portado de la app suelta de Pato (repo luciodpf/Camion). No pasa por el
+ * Apps Script de Maquinaria: lee la planilla del camión por CSV y escribe en
+ * su propio Apps Script, igual que la app original. Por eso las dos pueden
+ * estar publicadas al mismo tiempo sin pisarse.
+ *
+ * El write va por doGet con ?data= y mode no-cors: con doPost el cuerpo llega
+ * vacío desde GitHub Pages. La respuesta es opaca, no se puede leer, así que
+ * se recarga la planilla un rato después para confirmar.
+ */
+var CAM_SHEET = '1wkAAUVgFGOH8q0xni1nfyuFB_fXN5kfV6XkbORZ1YUQ';
+var CAM_HOJA  = 'Novedades';
+var CAM_SCRIPT = 'https://script.google.com/macros/s/AKfycbyyf9Nyvo2WbQgnXbgTeB_TVuYPxQG5Z-RJJPiVMK-S1IBPLxEg6LaZ4QaBflborVU/exec';
+
+var CAM_MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio',
+                 'Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+/* "nombre" es lo que se guarda en la planilla y no se toca (la app de Pato
+   viene escribiendo "Reparacion" sin tilde desde el arranque); "label" es
+   solo lo que se muestra. */
+var CAM_TIPOS = [
+  { nombre:'Viaje',         label:'Viaje',       corto:'Viaje',      ico:'🌾', pill:'cat-log' },
+  { nombre:'Combustible',   label:'Combustible', corto:'Gasoil',     ico:'⛽', pill:'cat-rep' },
+  { nombre:'Reparacion',    label:'Reparación',  corto:'Arreglo',    ico:'🔧', pill:'cat-gan' },
+  { nombre:'Mantenimiento', label:'Mantenimiento', corto:'Service',  ico:'🔩', pill:'cat-lab' }
+];
+
+function camLabel_(tipo) {
+  var t = CAM_TIPOS.filter(function (x) { return x.nombre === tipo; })[0];
+  return t ? t.label : (tipo || '');
+}
+
+var camRegistros = [], camTipoSel = 'Viaje', camUltimoKmVal = null;
+var camMes = new Date().getMonth(), camAnio = new Date().getFullYear();
+var camEditandoId = null, camEditandoReg = null;
+
+/* ---------- traer ---------- */
+function camCargar() {
+  var cont = document.getElementById('camLista');
+  cont.innerHTML = '<div class="item">Cargando...</div>';
+  var url = 'https://docs.google.com/spreadsheets/d/' + CAM_SHEET +
+            '/gviz/tq?tqx=out:csv&sheet=' + encodeURIComponent(CAM_HOJA) + '&t=' + Date.now();
+  fetch(url)
+    .then(function (r) { return r.text(); })
+    .then(function (csv) {
+      camRegistros = camParsear(csv);
+      camActualizarKm();
+      camLlenarListas();
+      camPintar();
+    })
+    .catch(function () {
+      cont.innerHTML = '<div class="item">No se pudo traer la planilla del camión.</div>';
+    });
+}
+
+function camParsear(csv) {
+  var lineas = csv.trim().split('\n');
+  if (lineas.length < 2) return [];
+  var out = [];
+  for (var i = 1; i < lineas.length; i++) {
+    var c = camParsearLinea(lineas[i]);
+    var limpio = function (x) { return (x || '').replace(/"/g, '').trim(); };
+    var fecha = limpio(c[0]);
+    if (!fecha) continue;
+    out.push({
+      fecha: fecha, km_camion: limpio(c[1]), tipo: limpio(c[2]),
+      origen: limpio(c[3]), destino: limpio(c[4]), kms_rec: limpio(c[5]),
+      especie: limpio(c[6]), kilos: limpio(c[7]), litros: limpio(c[8]),
+      actividad: limpio(c[9]), proveedor: limpio(c[10]), adicional: limpio(c[11]),
+      observaciones: limpio(c[12]), carta_porte: limpio(c[13]), id: limpio(c[14])
+    });
+  }
+  return out;
+}
+
+/** Los lotes vienen como "1,2": hay que respetar las comillas del CSV. */
+function camParsearLinea(linea) {
+  var r = [], cur = '', enComillas = false;
+  for (var i = 0; i < linea.length; i++) {
+    var ch = linea[i];
+    if (ch === '"') enComillas = !enComillas;
+    else if (ch === ',' && !enComillas) { r.push(cur); cur = ''; }
+    else cur += ch;
+  }
+  r.push(cur);
+  return r;
+}
+
+function camFecha_(s) {
+  if (!s) return null;
+  var p = String(s).split('/');
+  if (p.length === 3) return new Date(+p[2], +p[1] - 1, +p[0]);
+  var d = new Date(s);
+  return isNaN(d) ? null : d;
+}
+
+function camActualizarKm() {
+  var con = camRegistros.filter(function (r) { return r.km_camion && !isNaN(+r.km_camion); });
+  if (!con.length) return;
+  con.sort(function (a, b) { return (camFecha_(b.fecha) || 0) - (camFecha_(a.fecha) || 0); });
+  camUltimoKmVal = +con[0].km_camion;
+  document.getElementById('camUltimoKm').textContent = camUltimoKmVal.toLocaleString('es-AR');
+}
+
+function camLlenarListas() {
+  var llenar = function (id, vals) {
+    var dl = document.getElementById(id);
+    if (!dl) return;
+    var vistos = {}, op = '';
+    vals.forEach(function (v) { if (v && !vistos[v]) { vistos[v] = 1; op += '<option value="' + escHtml_(v) + '">'; } });
+    dl.innerHTML = op;
+  };
+  llenar('camDlOrigen', camRegistros.map(function (r) { return r.origen; }));
+  llenar('camDlDestino', camRegistros.map(function (r) { return r.destino; }));
+  llenar('camDlProveedores', camRegistros.map(function (r) { return r.proveedor; }));
+}
+
+/* ---------- pintar ---------- */
+function camDelMes() {
+  return camRegistros.filter(function (r) {
+    var d = camFecha_(r.fecha);
+    return d && d.getMonth() === camMes && d.getFullYear() === camAnio;
+  }).sort(function (a, b) { return (camFecha_(b.fecha) || 0) - (camFecha_(a.fecha) || 0); });
+}
+
+function camCambiarMes(d) {
+  camMes += d;
+  if (camMes > 11) { camMes = 0; camAnio++; }
+  if (camMes < 0) { camMes = 11; camAnio--; }
+  camPintar();
+}
+
+function camPintar() {
+  document.getElementById('camMesLabel').textContent = CAM_MESES[camMes] + ' ' + camAnio;
+  var cont = document.getElementById('camLista');
+  var regs = camDelMes();
+  if (!regs.length) {
+    cont.innerHTML = '<div class="item">Sin novedades en ' + CAM_MESES[camMes] + '.</div>';
+    return;
+  }
+
+  var html = '', diaAnterior = '';
+  regs.forEach(function (r) {
+    if (r.fecha !== diaAnterior) {
+      diaAnterior = r.fecha;
+      var d = camFecha_(r.fecha);
+      html += '<div class="camDia">' +
+              (d ? d.toLocaleDateString('es-AR', { weekday:'long', day:'numeric', month:'long' }) : r.fecha) +
+              '</div>';
+    }
+    html += camTarjeta(r);
+  });
+  cont.innerHTML = html;
+}
+
+function camTarjeta(r) {
+  var t = CAM_TIPOS.filter(function (x) { return x.nombre === r.tipo; })[0] ||
+          { ico:'📋', pill:'cat-otros' };
+  var titulo = r.tipo, detalle = '';
+
+  if (r.tipo === 'Viaje') {
+    titulo = (r.origen || '?') + ' → ' + (r.destino || '?');
+    detalle = [r.especie,
+               +r.kilos ? (+r.kilos / 1000).toFixed(1) + ' tn' : '',
+               r.kms_rec ? r.kms_rec + ' km' : ''].filter(Boolean).join(' · ');
+  } else if (r.tipo === 'Combustible') {
+    titulo = 'Carga de gasoil';
+    detalle = [r.litros ? r.litros + ' L' : '', r.proveedor].filter(Boolean).join(' · ');
+  } else if (r.tipo === 'Reparacion') {
+    titulo = r.actividad || 'Reparación';
+    detalle = r.proveedor || '';
+  } else if (r.tipo === 'Mantenimiento') {
+    titulo = r.actividad || 'Mantenimiento';
+  }
+
+  return '<div class="item">' +
+    '<div class="fila1">' +
+      '<span>' + t.ico + ' <span class="cat-pill ' + t.pill + '">' + escHtml_(camLabel_(r.tipo)) + '</span></span>' +
+      '<span>' + (r.km_camion ? (+r.km_camion).toLocaleString('es-AR') + ' km' : '') + '</span>' +
+    '</div>' +
+    '<div class="titulo">' + escHtml_(titulo) + '</div>' +
+    (detalle ? '<div class="desc">' + escHtml_(detalle) + '</div>' : '') +
+    (r.carta_porte ? '<div class="desc">CP: ' + escHtml_(r.carta_porte) + '</div>' : '') +
+    (r.observaciones ? '<div class="desc">' + escHtml_(r.observaciones) + '</div>' : '') +
+    '<div class="camAcc">' +
+      '<button class="btn chico fantasma" onclick="camEditar(\'' + escHtml_(r.id) + '\')">Editar</button>' +
+      '<button class="btn chico fantasma" onclick="camBorrar(\'' + escHtml_(r.id) + '\')">Borrar</button>' +
+    '</div>' +
+  '</div>';
+}
+
+/* ---------- cargar y corregir ---------- */
+function camVolverLista() {
+  document.getElementById('camPaso1').classList.remove('oculto');
+  document.getElementById('camPaso2').classList.add('oculto');
+  camEditandoId = null; camEditandoReg = null;
+}
+
+function camChips() {
+  var c = document.getElementById('camChipsTipo');
+  c.innerHTML = '';
+  CAM_TIPOS.forEach(function (t) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'chip' + (t.nombre === camTipoSel ? ' sel' : '');
+    b.innerHTML = '<span class="ic">' + t.ico + '</span>' + t.corto;
+    b.onclick = function () { camElegirTipo(t.nombre); };
+    c.appendChild(b);
+  });
+}
+
+function camElegirTipo(tipo) {
+  camTipoSel = tipo;
+  camChips();
+  CAM_TIPOS.forEach(function (t) {
+    var d = document.getElementById('camCampos-' + t.nombre);
+    if (d) d.classList.toggle('oculto', t.nombre !== tipo);
+  });
+}
+
+function camLimpiar() {
+  ['camOrigen','camDestino','camKmsRec','camEspecie','camKilos','camCartaPorte','camObs',
+   'camLitros','camProvComb','camObsComb','camActRep','camProvRep','camObsRep',
+   'camActMant','camObsMant'].forEach(function (id) {
+    var el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+}
+
+function camNueva() {
+  camEditandoId = null; camEditandoReg = null;
+  camLimpiar();
+  var h = new Date();
+  document.getElementById('camFecha').value = h.getFullYear() + '-' +
+    String(h.getMonth() + 1).padStart(2, '0') + '-' + String(h.getDate()).padStart(2, '0');
+  document.getElementById('camKmCamion').value = camUltimoKmVal || '';
+  document.getElementById('camTituloForm').textContent = 'Nueva novedad';
+  document.getElementById('camBtnGuardar').textContent = 'Guardar novedad';
+  camElegirTipo('Viaje');
+  document.getElementById('camPaso1').classList.add('oculto');
+  document.getElementById('camPaso2').classList.remove('oculto');
+  window.scrollTo(0, 0);
+}
+
+function camEditar(id) {
+  var r = camRegistros.filter(function (x) { return String(x.id) === String(id); })[0];
+  if (!r) { mostrarToast('No lo encontré'); return; }
+
+  camLimpiar();
+  camEditandoId = id; camEditandoReg = r;
+  document.getElementById('camTituloForm').textContent = 'Corrigiendo la novedad';
+  document.getElementById('camBtnGuardar').textContent = 'Guardar cambios';
+
+  var d = camFecha_(r.fecha);
+  if (d) {
+    document.getElementById('camFecha').value = d.getFullYear() + '-' +
+      String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  }
+  document.getElementById('camKmCamion').value = r.km_camion;
+  camElegirTipo(r.tipo || 'Viaje');
+
+  if (r.tipo === 'Viaje') {
+    document.getElementById('camOrigen').value = r.origen;
+    document.getElementById('camDestino').value = r.destino;
+    document.getElementById('camKmsRec').value = r.kms_rec;
+    document.getElementById('camEspecie').value = r.especie;
+    document.getElementById('camKilos').value = r.kilos;
+    document.getElementById('camCartaPorte').value = r.carta_porte;
+    document.getElementById('camObs').value = r.observaciones;
+  } else if (r.tipo === 'Combustible') {
+    document.getElementById('camLitros').value = r.litros;
+    document.getElementById('camProvComb').value = r.proveedor;
+    document.getElementById('camObsComb').value = r.observaciones;
+  } else if (r.tipo === 'Reparacion') {
+    document.getElementById('camActRep').value = r.actividad;
+    document.getElementById('camProvRep').value = r.proveedor;
+    document.getElementById('camObsRep').value = r.observaciones;
+  } else if (r.tipo === 'Mantenimiento') {
+    document.getElementById('camActMant').value = r.actividad;
+    document.getElementById('camObsMant').value = r.observaciones;
+  }
+
+  document.getElementById('camPaso1').classList.add('oculto');
+  document.getElementById('camPaso2').classList.remove('oculto');
+  window.scrollTo(0, 0);
+}
+
+function camGuardar() {
+  var btn = document.getElementById('camBtnGuardar');
+  var fecha = document.getElementById('camFecha').value;
+  var km = document.getElementById('camKmCamion').value;
+  if (!fecha || !km) { mostrarToast('Completá fecha y KM'); return; }
+
+  var p = fecha.split('-');
+  // La fecha va como texto dd/mm/aaaa: si no, Sheets la guarda como número
+  // de serie o le da vuelta el día con el mes.
+  var fila = {
+    Fecha: p[2] + '/' + p[1] + '/' + p[0],
+    KM_Camion: km, Tipo: camTipoSel,
+    Origen:'', Destino:'', KMs_Recorridos:'', Especie:'', Kilos:'',
+    Litros:'', Actividad:'', Proveedor:'',
+    Adicional: camEditandoReg ? camEditandoReg.adicional : '',
+    Observaciones:'', Carta_de_porte:''
+  };
+
+  if (camTipoSel === 'Viaje') {
+    fila.Origen = document.getElementById('camOrigen').value.trim();
+    fila.Destino = document.getElementById('camDestino').value.trim();
+    if (!fila.Origen || !fila.Destino) { mostrarToast('Completá origen y destino'); return; }
+    fila.KMs_Recorridos = document.getElementById('camKmsRec').value;
+    fila.Especie = document.getElementById('camEspecie').value;
+    fila.Kilos = document.getElementById('camKilos').value;
+    fila.Carta_de_porte = document.getElementById('camCartaPorte').value;
+    fila.Observaciones = document.getElementById('camObs').value;
+  } else if (camTipoSel === 'Combustible') {
+    fila.Litros = document.getElementById('camLitros').value;
+    fila.Proveedor = document.getElementById('camProvComb').value;
+    fila.Observaciones = document.getElementById('camObsComb').value;
+  } else if (camTipoSel === 'Reparacion') {
+    fila.Actividad = document.getElementById('camActRep').value;
+    fila.Proveedor = document.getElementById('camProvRep').value;
+    fila.Observaciones = document.getElementById('camObsRep').value;
+  } else if (camTipoSel === 'Mantenimiento') {
+    fila.Actividad = document.getElementById('camActMant').value;
+    fila.Observaciones = document.getElementById('camObsMant').value;
+  }
+
+  var carga = camEditandoId
+    ? { action:'update', id: camEditandoId, row: fila }
+    : { action:'append', row: fila };
+
+  btn.disabled = true;
+  btn.textContent = 'Guardando...';
+  camMandar(carga, camEditandoId ? 'Corregido ✓' : 'Guardado ✓', function () {
+    btn.disabled = false;
+    btn.textContent = camEditandoId ? 'Guardar cambios' : 'Guardar novedad';
+    camVolverLista();
+  });
+}
+
+function camBorrar(id) {
+  if (!confirm('¿Borrar esta novedad del camión? No se puede deshacer.')) return;
+  camMandar({ action:'delete', id: id }, 'Borrado ✓', function () {});
+}
+
+/** no-cors: la respuesta es opaca, no se puede leer si salió bien. Por eso se
+ *  espera un momento y se vuelve a traer la planilla, que es la verdad. */
+function camMandar(carga, aviso, alTerminar) {
+  fetch(CAM_SCRIPT + '?data=' + encodeURIComponent(JSON.stringify(carga)), { mode:'no-cors' })
+    .then(function () {
+      mostrarToast(aviso);
+      alTerminar();
+      setTimeout(camCargar, 900);
+    })
+    .catch(function () {
+      mostrarToast('No se pudo conectar');
+      alTerminar();
+    });
 }
 
 /* ====================== UTILIDADES ====================== */
