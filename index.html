@@ -7,6 +7,11 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#2a4a5e">
 <link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- Las de Fumigación (DM Mono + Fraunces) y las de Camión (IBM Plex): cada
+     sección conserva la tipografía que tenía cuando era una app aparte. -->
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:opsz,wght@9..144,300;9..144,600&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;600&display=swap" rel="stylesheet">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <style>
@@ -120,6 +125,104 @@
   .btn-foto{display:block;background:#fff;border:2px dashed var(--borde);color:var(--muted);
     border-radius:14px;padding:16px;text-align:center;font-weight:700;margin-bottom:16px;
     font-size:14px;}
+
+  /* ======================================================================
+     PIELES
+     Camión y Fumigación entraron de dos apps que ya tenían su estética. En
+     vez de aplanarlas al beige de Maquinaria, cada una se queda con la suya:
+     al entrar, el body toma su clase y se pinta toda la pantalla, barra de
+     arriba incluida. El inicio y las secciones propias siguen en beige.
+     Los valores salieron tal cual de camion-pato.html y de app.html.
+     ====================================================================== */
+
+  /* --- piel de Fumigación: la app verde de Lalo --- */
+  html.piel-fum{background:#0f1a0f;}
+  body.piel-fum{background:#0f1a0f;color:#e8f0e0;min-height:100vh;}
+  body.piel-fum header{background:#162216;border-bottom:1px solid #2a3a2a;}
+  body.piel-fum header h1{color:#7ec850;font-family:'Fraunces',Georgia,serif;}
+  body.piel-fum header #quienSoy{color:#9aaa88;}
+
+  #vFumigacion{font-family:'DM Mono',ui-monospace,monospace;color:#e8f0e0;}
+  #vFumigacion .volver{color:#7ec850;}
+  #vFumigacion .seccion-tit,#vFumigacion .camDia{color:#5a6a50;}
+  #vFumigacion .item{background:#162216;border-color:#2a3a2a;border-radius:12px;}
+  #vFumigacion .item .fila1{color:#5a6a50;font-size:10px;text-transform:uppercase;letter-spacing:.5px;}
+  #vFumigacion .item .titulo{font-family:'Fraunces',Georgia,serif;font-size:17px;color:#e8f0e0;}
+  #vFumigacion .item .desc{color:#9aaa88;font-size:11px;}
+  #vFumigacion .fumStat,#vFumigacion .fumOps,#vFumigacion .fumCampo,
+  #vFumigacion .camBarra{background:#1e2e1e;border-color:#2a3a2a;}
+  #vFumigacion .fumStat b{font-family:'Fraunces',Georgia,serif;font-size:24px;color:#7ec850;}
+  #vFumigacion .fumStat span,#vFumigacion .fumOps .tit,
+  #vFumigacion .fumCampo span{color:#5a6a50;}
+  #vFumigacion .fumOps .fila{color:#9aaa88;font-size:12px;}
+  #vFumigacion .fumOps .fila b{font-family:'Fraunces',Georgia,serif;font-size:15px;
+    color:#7ec850;font-weight:600;}
+  #vFumigacion .fumCampo b{font-family:'Fraunces',Georgia,serif;color:#e8f0e0;}
+  #vFumigacion .camMes span{font-family:'Fraunces',Georgia,serif;font-size:16px;
+    text-transform:capitalize;font-weight:600;}
+  #vFumigacion .camMesBtn{background:none;border:none;color:#9aaa88;}
+  #vFumigacion .fumProd{border-bottom-color:#2a3a2a;font-size:12px;}
+  #vFumigacion .fumProd .cant{color:#7ec850;font-size:11px;}
+  #vFumigacion .chip{background:#1e2e1e;border-color:#2a3a2a;color:#9aaa88;
+    font-family:'DM Mono',monospace;font-size:11px;padding:7px 14px;border-radius:20px;
+    letter-spacing:.3px;}
+  #vFumigacion .chip.sel{background:rgba(126,200,80,.15);border-color:#7ec850;color:#7ec850;}
+  #vFumigacion .campo label{color:#5a6a50;font-size:10px;text-transform:uppercase;
+    letter-spacing:.8px;font-weight:400;}
+  #vFumigacion .campo label .opt{color:#5a6a50;}
+  #vFumigacion .campo input,#vFumigacion .campo select,#vFumigacion .campo textarea{
+    background:#1e2e1e;border-color:#2a3a2a;color:#e8f0e0;
+    font-family:'DM Mono',monospace;font-size:14px;}
+  #vFumigacion .btn.grande,#vFumigacion .btn.grande.verde{background:#4a8a20;color:#fff;
+    border:none;font-family:'DM Mono',monospace;font-weight:500;letter-spacing:.3px;}
+  #vFumigacion .btn.chico.fantasma{background:none;border:1px solid #2a3a2a;color:#9aaa88;
+    font-family:'DM Mono',monospace;font-size:11px;border-radius:8px;width:100%;}
+  #vFumigacion .fumEditor input,#vFumigacion .fumProdNuevo input{background:#0f1a0f;
+    border:1px solid #7ec850;color:#e8f0e0;font-family:'DM Mono',monospace;font-size:12px;}
+  #vFumigacion .fumEditor .ok{background:#4a8a20;}
+  #vFumigacion .fumEditor .no,#vFumigacion .fumProdNuevo button{background:none;
+    border:1px solid #2a3a2a;color:#5a6a50;}
+
+  /* --- piel de Camión: la app azul de Pato --- */
+  html.piel-cam{background:#0f0f1a;}
+  body.piel-cam{background:#0f0f1a;color:#e8e8f0;min-height:100vh;}
+  body.piel-cam header{background:#1a1a2e;border-bottom:1px solid #2e2e4a;}
+  body.piel-cam header h1{color:#e8c547;font-family:'IBM Plex Mono',monospace;font-size:17px;}
+  body.piel-cam header #quienSoy{color:#7070a0;font-family:'IBM Plex Mono',monospace;}
+
+  #vCamion{font-family:'IBM Plex Sans',sans-serif;color:#e8e8f0;}
+  #vCamion .volver{color:#e8c547;}
+  #vCamion .item{background:#1a1a2e;border-color:#2e2e4a;border-radius:10px;}
+  #vCamion .item .fila1{color:#7070a0;font-family:'IBM Plex Mono',monospace;font-size:12px;}
+  #vCamion .item .titulo{font-size:14px;font-weight:600;color:#e8e8f0;}
+  #vCamion .item .desc{color:#7070a0;font-size:12px;}
+  #vCamion .camBarra{background:#1a1a2e;border-color:#2e2e4a;}
+  #vCamion .camMes{font-family:'IBM Plex Mono',monospace;font-size:15px;
+    text-transform:uppercase;letter-spacing:.08em;}
+  #vCamion .camMesBtn{background:#22223a;border-color:#2e2e4a;color:#e8e8f0;}
+  #vCamion .camKm b{color:#4fc3f7;font-family:'IBM Plex Mono',monospace;}
+  #vCamion .camKm span{color:#7070a0;font-family:'IBM Plex Mono',monospace;}
+  #vCamion .camDia{color:#7070a0;font-family:'IBM Plex Mono',monospace;letter-spacing:.1em;}
+  #vCamion .campo label{color:#7070a0;font-family:'IBM Plex Mono',monospace;font-size:11px;
+    text-transform:uppercase;letter-spacing:.08em;font-weight:400;}
+  #vCamion .campo input,#vCamion .campo select,#vCamion .campo textarea{background:#22223a;
+    border-color:#2e2e4a;color:#e8e8f0;font-family:'IBM Plex Sans',sans-serif;font-size:15px;}
+  #vCamion .chip{background:#22223a;border-color:#2e2e4a;color:#7070a0;}
+  #vCamion .chip.sel{background:rgba(232,197,71,.1);border-color:#e8c547;color:#e8c547;}
+  #vCamion .camTipos .chip{font-family:'IBM Plex Mono',monospace;}
+  #vCamion .btn.grande,#vCamion .btn.grande.verde{background:#e8c547;color:#0f0f1a;
+    border:none;font-weight:600;}
+  #vCamion .btn.chico.fantasma{background:rgba(232,197,71,.12);
+    border:1px solid rgba(232,197,71,.2);color:#e8c547;
+    font-family:'IBM Plex Mono',monospace;font-size:11px;}
+  /* borrar en rojo, como estaba en la app de Pato */
+  #vCamion .camAcc .btn:last-child{background:rgba(255,107,107,.12);
+    border-color:rgba(255,107,107,.2);color:#ff6b6b;}
+  #vCamion .cat-pill{font-family:'IBM Plex Mono',monospace;}
+  #vCamion .cat-log{background:rgba(232,197,71,.15);color:#e8c547;}
+  #vCamion .cat-rep{background:rgba(79,195,247,.15);color:#4fc3f7;}
+  #vCamion .cat-gan{background:rgba(255,107,107,.15);color:#ff6b6b;}
+  #vCamion .cat-lab{background:rgba(105,219,124,.15);color:#69db7c;}
 
   /* fumigación */
   .fumStats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;}
@@ -700,6 +803,15 @@ function ir(vista) {
     document.getElementById('v' + capitaliza_(v)).classList.add('oculto');
   });
   document.getElementById('v' + capitaliza_(vista)).classList.remove('oculto');
+
+  // cada sección traída de otra app se pinta con la piel que tenía suelta,
+  // barra de arriba y color de la barra de estado del teléfono incluidos
+  var piel = (vista === 'camion') ? 'piel-cam' : (vista === 'fumigacion' ? 'piel-fum' : '');
+  document.body.className = piel;
+  document.documentElement.className = piel;   // si no, el rebote del scroll muestra el beige
+  var meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.setAttribute('content',
+    piel === 'piel-cam' ? '#1a1a2e' : (piel === 'piel-fum' ? '#162216' : '#2a4a5e'));
 
   if (vista === 'combustible') { volverCombPaso1(); cargarCombustible(); }
   if (vista === 'remitos') { cargarRemitos(); }
