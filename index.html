@@ -372,6 +372,20 @@
   table.planilla tr:not(.abierta) .prov{overflow:hidden;text-overflow:ellipsis;}
   .planResumen{font-size:13px;color:var(--muted);margin-bottom:10px;}
   .planPie{font-size:12px;color:var(--muted);margin-top:10px;text-align:center;}
+  /* visor de fotos a pantalla completa: pellizcar o doble toque para zoom */
+  .item img,.tarea img{cursor:zoom-in;}
+  #visor{position:fixed;inset:0;background:#000;z-index:9999;display:none;
+    overflow:hidden;touch-action:none;}
+  #visor.abierto{display:block;}
+  #visor img{position:absolute;left:0;top:0;transform-origin:0 0;max-width:none;
+    user-select:none;-webkit-user-drag:none;}
+  #visor .cerrar{position:absolute;top:12px;right:12px;width:44px;height:44px;
+    border-radius:50%;border:2px solid rgba(255,255,255,.8);background:rgba(0,0,0,.65);color:#fff;
+    font-size:22px;line-height:40px;padding:0;z-index:2;cursor:pointer;}
+  body:has(#visor.abierto){overflow:hidden;}
+  #visor .ayuda{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);
+    background:rgba(0,0,0,.65);padding:6px 12px;border-radius:999px;white-space:nowrap;
+    color:#fff;font-size:12px;pointer-events:none;z-index:2;}
 
   .toast{position:fixed;left:16px;right:16px;bottom:20px;max-width:520px;margin:0 auto;
     background:var(--ink);color:#fff;padding:14px 18px;border-radius:12px;
@@ -769,6 +783,11 @@
 
 <div id="toast" class="toast oculto"></div>
 
+<div id="visor">
+  <button class="cerrar" onclick="cerrarVisor()">✕</button>
+  <img id="visorImg" alt="">
+  <div class="ayuda">Pellizcá o tocá dos veces para hacer zoom</div>
+</div>
 <script>
 /* ====================== CONFIGURACIÓN ====================== */
 var BACKEND = 'https://script.google.com/macros/s/AKfycbx8m-NVac3NrUp-7CRIq9dGxC5oIV5qaSmddv2Xm0uj9WZGYUw_igoy8JBiZaVEfWtbUw/exec';
@@ -2370,6 +2389,143 @@ function escHtml_(s) {
   d.textContent = s || '';
   return d.innerHTML;
 }
+
+/* ====================== VISOR DE FOTOS ======================
+   El viewport tiene maximum-scale=1 (para que no se agrande solo al escribir
+   en un campo), asi que el pellizco del celular no anda sobre las fotos.
+   Este visor abre la foto a pantalla completa con su propio zoom. */
+var visor = { esc: 1, x: 0, y: 0, min: 1, toques: {}, ultimoToque: 0, arrastre: null, pinza: null };
+
+document.addEventListener('click', function (ev) {
+  var t = ev.target;
+  if (t.tagName === 'IMG' && t.closest && t.closest('.item, .tarea')) abrirVisor(t.src);
+});
+
+function abrirVisor(src) {
+  // Drive devuelve el thumbnail a 800px; para leer un remito pedimos mas grande
+  var grande = src.replace(/([?&]sz=)w\d+/, '$1w2000');
+  var img = document.getElementById('visorImg');
+  var v = document.getElementById('visor');
+  img.onload = function () { visorEncajar_(); };
+  img.onerror = function () { if (img.src !== src) img.src = src; };
+  img.src = grande;
+  v.classList.add('abierto');
+  history.pushState({ visor: true }, '');
+}
+
+function cerrarVisor() {
+  if (history.state && history.state.visor) history.back();
+  else document.getElementById('visor').classList.remove('abierto');
+}
+window.addEventListener('popstate', function () {
+  document.getElementById('visor').classList.remove('abierto');
+});
+
+function visorEncajar_() {
+  var img = document.getElementById('visorImg');
+  var W = window.innerWidth, H = window.innerHeight;
+  visor.min = Math.min(W / img.naturalWidth, H / img.naturalHeight);
+  visor.esc = visor.min;
+  visor.x = (W - img.naturalWidth * visor.esc) / 2;
+  visor.y = (H - img.naturalHeight * visor.esc) / 2;
+  visorAplicar_();
+}
+
+function visorAplicar_() {
+  var img = document.getElementById('visorImg');
+  var W = window.innerWidth, H = window.innerHeight;
+  var w = img.naturalWidth * visor.esc, h = img.naturalHeight * visor.esc;
+  // que la foto no se escape de la pantalla: centrada si es chica, pegada a los bordes si es grande
+  visor.x = w <= W ? (W - w) / 2 : Math.min(0, Math.max(W - w, visor.x));
+  visor.y = h <= H ? (H - h) / 2 : Math.min(0, Math.max(H - h, visor.y));
+  img.style.transform = 'translate(' + visor.x + 'px,' + visor.y + 'px) scale(' + visor.esc + ')';
+}
+
+/* zoom alrededor de un punto de la pantalla (cx, cy) */
+function visorZoom_(nueva, cx, cy) {
+  nueva = Math.max(visor.min, Math.min(visor.min * 8, nueva));
+  var f = nueva / visor.esc;
+  visor.x = cx - (cx - visor.x) * f;
+  visor.y = cy - (cy - visor.y) * f;
+  visor.esc = nueva;
+  visorAplicar_();
+}
+
+(function () {
+  var v = document.getElementById('visor');
+  function dist(a, b) { return Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY); }
+
+  v.addEventListener('touchstart', function (e) {
+    if (e.target.classList.contains('cerrar')) return;
+    e.preventDefault();
+    if (e.touches.length === 2) {
+      var a = e.touches[0], b = e.touches[1];
+      visor.pinza = { d: dist(a, b), esc: visor.esc };
+      visor.arrastre = null;
+    } else if (e.touches.length === 1) {
+      var t = e.touches[0], ahora = Date.now();
+      if (ahora - visor.ultimoToque < 300) {
+        // doble toque: acercar ahi, o volver a encajar si ya estaba con zoom
+        if (visor.esc > visor.min * 1.05) visorEncajar_();
+        else visorZoom_(visor.min * 3, t.clientX, t.clientY);
+        visor.ultimoToque = 0;
+      } else {
+        visor.ultimoToque = ahora;
+      }
+      visor.arrastre = { x: t.clientX, y: t.clientY };
+    }
+  }, { passive: false });
+
+  v.addEventListener('touchmove', function (e) {
+    e.preventDefault();
+    if (e.touches.length === 2 && visor.pinza) {
+      var a = e.touches[0], b = e.touches[1];
+      var cx = (a.clientX + b.clientX) / 2, cy = (a.clientY + b.clientY) / 2;
+      visorZoom_(visor.pinza.esc * dist(a, b) / visor.pinza.d, cx, cy);
+    } else if (e.touches.length === 1 && visor.arrastre) {
+      var t = e.touches[0];
+      visor.x += t.clientX - visor.arrastre.x;
+      visor.y += t.clientY - visor.arrastre.y;
+      visor.arrastre = { x: t.clientX, y: t.clientY };
+      visorAplicar_();
+    }
+  }, { passive: false });
+
+  v.addEventListener('touchend', function (e) {
+    if (e.touches.length < 2) visor.pinza = null;
+    if (e.touches.length === 1) visor.arrastre = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+    if (e.touches.length === 0) visor.arrastre = null;
+  });
+
+  // en la compu: rueda para zoom, arrastrar con el mouse, doble click
+  v.addEventListener('wheel', function (e) {
+    e.preventDefault();
+    visorZoom_(visor.esc * (e.deltaY < 0 ? 1.2 : 1 / 1.2), e.clientX, e.clientY);
+  }, { passive: false });
+  v.addEventListener('mousedown', function (e) {
+    if (e.target.classList.contains('cerrar')) return;
+    e.preventDefault();
+    visor.arrastre = { x: e.clientX, y: e.clientY };
+  });
+  window.addEventListener('mousemove', function (e) {
+    if (!visor.arrastre || e.buttons !== 1) return;
+    visor.x += e.clientX - visor.arrastre.x;
+    visor.y += e.clientY - visor.arrastre.y;
+    visor.arrastre = { x: e.clientX, y: e.clientY };
+    visorAplicar_();
+  });
+  window.addEventListener('mouseup', function () { visor.arrastre = null; });
+  v.addEventListener('dblclick', function (e) {
+    if (visor.esc > visor.min * 1.05) visorEncajar_();
+    else visorZoom_(visor.min * 3, e.clientX, e.clientY);
+  });
+  window.addEventListener('resize', function () {
+    if (v.classList.contains('abierto')) visorEncajar_();
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && v.classList.contains('abierto')) cerrarVisor();
+  });
+})();
 </script>
 </body>
 </html>
