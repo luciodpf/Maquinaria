@@ -71,6 +71,24 @@
     background:#fff;font-size:14px;font-weight:600;}
   .chip.sel{background:var(--accent);color:#fff;border-color:var(--accent);}
 
+  .opcional{font-weight:400;}
+  .ayuda-lista{font-size:12px;color:var(--muted);margin:6px 2px 0;}
+  #listaCombustible .item{cursor:pointer;}
+
+  /* Campo que se escribe y además despliega la lista guardada (Vehículo, Implemento) */
+  .combo{position:relative;}
+  .campo .combo input[type=text]{padding-right:52px;}
+  .combo-flecha{position:absolute;top:0;right:0;width:50px;height:100%;border:none;
+    background:none;font-size:20px;color:var(--muted);}
+  .combo-lista{position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:20;
+    max-height:260px;overflow-y:auto;background:#fff;border:1px solid var(--borde);
+    border-radius:10px;box-shadow:0 6px 18px rgba(0,0,0,.12);}
+  .combo-op{display:flex;justify-content:space-between;align-items:center;gap:8px;
+    padding:13px 14px;border-bottom:1px solid var(--borde);font-size:15px;}
+  .combo-op:last-child{border-bottom:none;}
+  .combo-op small{color:var(--muted);font-size:12px;white-space:nowrap;}
+  .combo-op.nueva{color:var(--accent);font-weight:600;}
+
   .maquinas{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;}
   .maquinas .chip{border-radius:10px;text-align:center;padding:14px 6px;}
 
@@ -431,17 +449,58 @@
       <button class="btn grande verde" onclick="combElegirTipo('Carga a máquina')">⛽ Cargar a una máquina</button>
       <button class="btn grande secundario" onclick="combElegirTipo('Llegada al galpón')">🛢️ Llegó combustible al galpón</button>
 
-      <div class="seccion-tit">Últimas cargas</div>
+      <div class="seccion-tit">Cargas</div>
+      <div class="campo" style="margin-bottom:0;">
+        <input type="text" id="combBuscar" autocomplete="off"
+          placeholder="🔍 Buscar: máquina, tarea, fecha (12/10)…" oninput="pintarCargasComb_()">
+      </div>
+      <p class="ayuda-lista">Tocá una carga para corregirla o borrarla.</p>
       <div class="lista" id="listaCombustible"></div>
+      <button class="btn fantasma oculto" id="combVerMas" onclick="combVerMas()">Ver más</button>
     </div>
 
     <div id="combPaso2" class="oculto">
       <button class="volver" onclick="volverCombPaso1()">‹ Volver</button>
       <p style="font-weight:700;font-size:16px;" id="combTituloTipo"></p>
 
-      <div class="campo oculto" id="combCampoMaquina">
-        <label>Máquina</label>
-        <div class="maquinas" id="chipsMaquinasComb"></div>
+      <!-- Solo al corregir una carga ya guardada -->
+      <div id="combCamposEdicion" class="oculto">
+        <div class="campo">
+          <label>Tipo</label>
+          <div class="chips">
+            <button type="button" class="chip" data-tipo="Carga a máquina" onclick="combCambiarTipo(this.dataset.tipo)">⛽ Carga a máquina</button>
+            <button type="button" class="chip" data-tipo="Llegada al galpón" onclick="combCambiarTipo(this.dataset.tipo)">🛢️ Llegada al galpón</button>
+          </div>
+        </div>
+        <div class="campo">
+          <label>Fecha</label>
+          <input type="date" id="combFecha">
+        </div>
+      </div>
+
+      <div id="combCamposMaquina" class="oculto">
+        <div class="campo">
+          <label>Vehículo</label>
+          <div class="combo" id="comboVehiculo">
+            <input type="text" id="combVehiculo" autocomplete="off" placeholder="Escribí o tocá la flecha">
+            <button type="button" class="combo-flecha" tabindex="-1" aria-label="Ver la lista">▾</button>
+            <div class="combo-lista oculto"></div>
+          </div>
+        </div>
+
+        <div class="campo">
+          <label>Implemento remolcado <span class="opcional">(opcional)</span></label>
+          <div class="combo" id="comboImplemento">
+            <input type="text" id="combImplemento" autocomplete="off" placeholder="Ninguno">
+            <button type="button" class="combo-flecha" tabindex="-1" aria-label="Ver la lista">▾</button>
+            <div class="combo-lista oculto"></div>
+          </div>
+        </div>
+
+        <div class="campo">
+          <label>Finalidad</label>
+          <input type="text" id="combFinalidad" placeholder="Ej: siembra lote 4, rollos, flete">
+        </div>
       </div>
 
       <div class="campo">
@@ -449,7 +508,13 @@
         <input type="number" id="combLitros" inputmode="decimal" placeholder="0">
       </div>
 
-      <button class="btn grande" onclick="guardarCombustibleUI(this)">Guardar</button>
+      <div class="campo" id="combCampoObs">
+        <label>Observaciones <span class="opcional">(opcional)</span></label>
+        <textarea id="combObs"></textarea>
+      </div>
+
+      <button class="btn grande" id="combBtnGuardar" onclick="guardarCombustibleUI(this)">Guardar</button>
+      <button class="btn rojo oculto" id="combBtnBorrar" onclick="borrarCombustibleUI(this)">🗑️ Borrar esta carga</button>
     </div>
   </section>
 
@@ -893,7 +958,9 @@ function ordenarInicio() {
 var estado = {
   maquinas: [],
   combTipo: '',
-  combMaquina: '',
+  combEditId: null,
+  combCargas: [],
+  combMostrar: 30,
   remFotoDataUrl: '',
   tarFotoDataUrl: '',
   tarCategoriaSel: CATEGORIA_DEFAULT, // "Otros" por defecto, así nunca queda vacía
@@ -999,77 +1066,230 @@ function cargarMaquinas() {
   }).catch(function () {});
 }
 
-function renderChipsMaquinas_(contId, onClick, seleccionada) {
+/* Tipos que van enganchados a un tractor: son los que se ofrecen como
+ * "Implemento remolcado". El resto (y las que no tienen tipo) van en Vehículo. */
+var TIPOS_REMOLCADOS = ['Implemento', 'Sembradora', 'Acoplado', 'Mixer/Feedlot'];
+
+function esRemolcado_(m) { return TIPOS_REMOLCADOS.indexOf(m.tipo) >= 0; }
+
+function normaliza_(s) {
+  return String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+}
+
+/** Si lo escrito es una máquina ya guardada (sin importar mayúsculas ni tildes),
+ *  devuelve el nombre tal cual está en la lista, para no duplicarla. */
+function nombreCanonico_(texto) {
+  var t = normaliza_(texto);
+  if (!t) return '';
+  var m = estado.maquinas.filter(function (m) { return normaliza_(m.nombre) === t; })[0];
+  return m ? m.nombre : String(texto).trim();
+}
+
+/* ====================== COMBO (escribir + lista) ======================
+ * Un campo de texto con flecha: la flecha despliega todas las guardadas, y
+ * al escribir va mostrando abajo las que coinciden (alcanza con un pedazo de
+ * cada palabra: "deutz 190" encuentra "Deutz 6x190"). Si lo escrito no está,
+ * se puede usar igual y queda guardada para la próxima.
+ */
+function armarCombo_(contId, opcionesFn) {
   var cont = document.getElementById(contId);
-  cont.innerHTML = '';
-  estado.maquinas.forEach(function (m) {
-    var b = document.createElement('button');
-    b.className = 'chip' + (m.nombre === seleccionada ? ' sel' : '');
-    b.textContent = m.nombre;
-    b.onclick = function () { onClick(m.nombre); };
-    cont.appendChild(b);
+  var input = cont.querySelector('input');
+  var lista = cont.querySelector('.combo-lista');
+  var flecha = cont.querySelector('.combo-flecha');
+
+  function cerrar() { lista.classList.add('oculto'); }
+
+  function pintar(filtrar) {
+    var q = filtrar ? normaliza_(input.value) : '';
+    var palabras = q ? q.split(/\s+/) : [];
+    var coincide = function (m) {
+      var n = normaliza_(m.nombre);
+      return palabras.every(function (p) { return n.indexOf(p) >= 0; });
+    };
+    var ops = opcionesFn().filter(coincide);
+    // Si en su lista no hay nada, busca en todas (por si está mal clasificada)
+    if (q && !ops.length) ops = estado.maquinas.filter(coincide);
+    if (q) ops.sort(function (a, b) {
+      return (normaliza_(a.nombre).indexOf(q) === 0 ? 0 : 1) - (normaliza_(b.nombre).indexOf(q) === 0 ? 0 : 1);
+    });
+
+    lista.innerHTML = '';
+    ops.forEach(function (m) {
+      var d = document.createElement('div');
+      d.className = 'combo-op';
+      d.innerHTML = '<span>' + escHtml_(m.nombre) + '</span>' + (m.tipo ? '<small>' + escHtml_(m.tipo) + '</small>' : '');
+      d.onclick = function () { input.value = m.nombre; cerrar(); };
+      lista.appendChild(d);
+    });
+    var exacta = ops.some(function (m) { return normaliza_(m.nombre) === q; });
+    if (q && !exacta) {
+      var n = document.createElement('div');
+      n.className = 'combo-op nueva';
+      n.innerHTML = '<span>+ Usar «' + escHtml_(input.value.trim()) + '»</span><small>nueva</small>';
+      n.onclick = function () { input.value = input.value.trim(); cerrar(); };
+      lista.appendChild(n);
+    }
+    lista.classList.toggle('oculto', !lista.children.length);
+  }
+
+  input.addEventListener('input', function () { pintar(true); });
+  input.addEventListener('focus', function () { pintar(true); });
+  flecha.addEventListener('click', function () {
+    if (lista.classList.contains('oculto')) pintar(false); else cerrar();
   });
+  document.addEventListener('click', function (ev) { if (!cont.contains(ev.target)) cerrar(); });
 }
 
 /* ====================== COMBUSTIBLE ====================== */
-function combElegirTipo(tipo) {
-  estado.combTipo = tipo;
-  estado.combMaquina = '';
+var combosArmados = false;
+
+var COMB_PAGINA = 30;
+
+function combElegirTipo(tipo) { combAbrirForm_(tipo, null); }
+
+/** c = null para una carga nueva, o la carga guardada que se va a corregir. */
+function combAbrirForm_(tipo, c) {
+  estado.combEditId = c ? c.id : null;
   document.getElementById('combPaso1').classList.add('oculto');
   document.getElementById('combPaso2').classList.remove('oculto');
-  document.getElementById('combTituloTipo').textContent = tipo === 'Carga a máquina'
-    ? '⛽ Cargando a una máquina' : '🛢️ Llegada al galpón';
-  document.getElementById('combLitros').value = '';
+  window.scrollTo(0, 0);
 
-  var campoMaq = document.getElementById('combCampoMaquina');
-  if (tipo === 'Carga a máquina') {
-    campoMaq.classList.remove('oculto');
-    renderChipsMaquinasComb_();
-  } else {
-    campoMaq.classList.add('oculto');
+  var valores = {
+    combLitros: c ? c.litros : '', combVehiculo: c ? c.maquina : '',
+    combImplemento: c ? c.implemento : '', combFinalidad: c ? c.finalidad : '',
+    combObs: c ? c.observaciones : '', combFecha: c ? c.fecha : ''
+  };
+  Object.keys(valores).forEach(function (id) { document.getElementById(id).value = valores[id] || ''; });
+
+  if (!combosArmados) {
+    combosArmados = true;
+    armarCombo_('comboVehiculo', function () {
+      return estado.maquinas.filter(function (m) { return !esRemolcado_(m); });
+    });
+    armarCombo_('comboImplemento', function () {
+      return estado.maquinas.filter(esRemolcado_);
+    });
   }
+
+  document.getElementById('combCamposEdicion').classList.toggle('oculto', !c);
+  document.getElementById('combBtnBorrar').classList.toggle('oculto', !c);
+  document.getElementById('combBtnGuardar').textContent = c ? 'Guardar cambios' : 'Guardar';
+  combCambiarTipo(tipo);
 }
 
-function renderChipsMaquinasComb_() {
-  renderChipsMaquinas_('chipsMaquinasComb', function (n) {
-    estado.combMaquina = n;
-    renderChipsMaquinasComb_();
-  }, estado.combMaquina);
+function combCambiarTipo(tipo) {
+  estado.combTipo = tipo;
+  var esCarga = tipo === 'Carga a máquina';
+  document.getElementById('combTituloTipo').textContent = estado.combEditId
+    ? '✏️ Corrigiendo una carga'
+    : (esCarga ? '⛽ Cargando a una máquina' : '🛢️ Llegada al galpón');
+  document.getElementById('combCamposMaquina').classList.toggle('oculto', !esCarga);
+  document.querySelectorAll('#combCamposEdicion .chip').forEach(function (b) {
+    b.classList.toggle('sel', b.dataset.tipo === tipo);
+  });
 }
 
 function volverCombPaso1() {
+  estado.combEditId = null;
   document.getElementById('combPaso1').classList.remove('oculto');
   document.getElementById('combPaso2').classList.add('oculto');
 }
 
 function guardarCombustibleUI(btn) {
+  var esCarga = estado.combTipo === 'Carga a máquina';
+  var editando = !!estado.combEditId;
   var litros = document.getElementById('combLitros').value;
-  if (!litros || Number(litros) <= 0) { mostrarToast('Falta la cantidad'); return; }
-  if (estado.combTipo === 'Carga a máquina' && !estado.combMaquina) { mostrarToast('Elegí la máquina'); return; }
+  var vehiculo = esCarga ? nombreCanonico_(document.getElementById('combVehiculo').value) : '';
+  var implemento = esCarga ? nombreCanonico_(document.getElementById('combImplemento').value) : '';
+  var finalidad = esCarga ? document.getElementById('combFinalidad').value.trim() : '';
+  var obs = document.getElementById('combObs').value.trim();
+  var fecha = editando ? document.getElementById('combFecha').value : '';
 
-  conCarga_(btn, 'Guardando...', llamar('guardarCombustible', [{
-    tipo: estado.combTipo, maquina: estado.combMaquina,
-    litros: litros, quien: ''
-  }])).then(function () {
-    mostrarToast('Guardado ✓');
+  if (esCarga && !vehiculo) { mostrarToast('Falta el vehículo'); return; }
+  if (!litros || Number(litros) <= 0) { mostrarToast('Falta la cantidad'); return; }
+  if (editando && !fecha) { mostrarToast('Falta la fecha'); return; }
+
+  var datos = {
+    tipo: estado.combTipo, maquina: vehiculo, implemento: implemento,
+    finalidad: finalidad, observaciones: obs, litros: litros, quien: ''
+  };
+  if (editando) { datos.id = estado.combEditId; datos.fecha = fecha; }
+
+  conCarga_(btn, 'Guardando...', llamar(editando ? 'editarCombustible' : 'guardarCombustible', [datos]))
+  .then(function () {
+    mostrarToast(editando ? 'Corregida ✓' : 'Guardado ✓');
+    // Las nuevas el backend ya las sumó a la hoja Maquinas; acá se agregan
+    // para que aparezcan en la lista sin tener que recargar.
+    if (vehiculo && !estado.maquinas.some(function (m) { return m.nombre === vehiculo; }))
+      estado.maquinas.push({ nombre: vehiculo, tipo: '' });
+    if (implemento && !estado.maquinas.some(function (m) { return m.nombre === implemento; }))
+      estado.maquinas.push({ nombre: implemento, tipo: 'Implemento' });
     volverCombPaso1();
     cargarCombustible();
   }).catch(function (e) { mostrarToast('Error: ' + e.message); });
 }
 
+function borrarCombustibleUI(btn) {
+  if (!estado.combEditId) return;
+  if (!confirm('¿Borrar esta carga? No se puede deshacer.')) return;
+  conCarga_(btn, 'Borrando...', llamar('borrarCombustible', [estado.combEditId])).then(function () {
+    mostrarToast('Borrada');
+    volverCombPaso1();
+    cargarCombustible();
+  }).catch(function (e) { mostrarToast('Error: ' + e.message); });
+}
+
+/* Se traen todas de una vez (son filas chicas) y se busca acá, así la
+ * búsqueda es instantánea y no depende de la señal en el campo. */
 function cargarCombustible() {
-  llamar('getCombustible', [15]).then(function (r) {
-    var cont = document.getElementById('listaCombustible');
-    cont.innerHTML = '';
-    (r || []).forEach(function (c) {
-      var div = document.createElement('div');
-      div.className = 'item';
-      div.innerHTML =
-        '<div class="fila1"><span>' + fFecha_(c.fecha) + '</span><span>' + (c.quien || '') + '</span></div>' +
-        '<div class="titulo">' + c.litros + ' L — ' + c.tipo + (c.maquina ? ' · ' + c.maquina : '') + '</div>';
-      cont.appendChild(div);
-    });
+  llamar('getCombustible', [5000]).then(function (r) {
+    estado.combCargas = r || [];
+    estado.combMostrar = COMB_PAGINA;
+    pintarCargasComb_();
   }).catch(function () {});
+}
+
+function combVerMas() {
+  estado.combMostrar += COMB_PAGINA;
+  pintarCargasComb_();
+}
+
+function textoBusquedaComb_(c) {
+  var f = fFecha_(c.fecha); // dd/mm/aa
+  return normaliza_([f, f.slice(0, 5), c.fecha, c.tipo, c.maquina, c.implemento,
+    c.finalidad, c.observaciones, c.litros + ' l', c.quien].join(' '));
+}
+
+function pintarCargasComb_() {
+  var q = normaliza_(document.getElementById('combBuscar').value);
+  var palabras = q ? q.split(/\s+/) : [];
+  var filtradas = (estado.combCargas || []).filter(function (c) {
+    var t = textoBusquedaComb_(c);
+    return palabras.every(function (p) { return t.indexOf(p) >= 0; });
+  });
+
+  var cont = document.getElementById('listaCombustible');
+  cont.innerHTML = '';
+  if (!filtradas.length) {
+    cont.innerHTML = '<p class="ayuda-lista">' + (q ? 'No hay cargas que coincidan.' : 'Todavía no hay cargas.') + '</p>';
+  }
+  filtradas.slice(0, estado.combMostrar).forEach(function (c) {
+    var maq = [c.maquina, c.implemento].filter(Boolean).join(' + ');
+    var div = document.createElement('div');
+    div.className = 'item';
+    div.innerHTML =
+      '<div class="fila1"><span>' + fFecha_(c.fecha) + '</span><span>' + escHtml_(c.quien || '') + '</span></div>' +
+      '<div class="titulo">' + escHtml_(String(c.litros)) + ' L — ' + escHtml_(c.tipo) + (maq ? ' · ' + escHtml_(maq) : '') + '</div>' +
+      (c.finalidad ? '<div style="font-size:14px;">' + escHtml_(c.finalidad) + '</div>' : '') +
+      (c.observaciones ? '<div style="font-size:13px;color:var(--muted);">' + escHtml_(c.observaciones) + '</div>' : '');
+    div.onclick = function () { combAbrirForm_(c.tipo || 'Carga a máquina', c); };
+    cont.appendChild(div);
+  });
+
+  var resto = filtradas.length - estado.combMostrar;
+  var verMas = document.getElementById('combVerMas');
+  verMas.classList.toggle('oculto', resto <= 0);
+  verMas.textContent = 'Ver más (' + resto + ' restantes)';
 }
 
 /* ====================== REMITOS ====================== */
