@@ -539,6 +539,10 @@
         <input type="text" id="remFecha" placeholder="AAAA-MM-DD">
       </div>
       <div class="campo">
+        <label>Nº de remito</label>
+        <input type="text" id="remNumero" placeholder="Ej: 0012-00011132">
+      </div>
+      <div class="campo">
         <label>Proveedor</label>
         <input type="text" id="remProveedor" placeholder="Comercio o proveedor">
       </div>
@@ -1317,6 +1321,7 @@ function remFotoElegida(ev) {
 
     // Fecha de hoy como default, por si la lectura automática falla o no la trae.
     document.getElementById('remFecha').value = new Date().toISOString().slice(0, 10);
+    document.getElementById('remNumero').value = '';
     document.getElementById('remProveedor').value = '';
     document.getElementById('remMonto').value = '';
     document.getElementById('remDescripcion').value = '';
@@ -1327,6 +1332,7 @@ function remFotoElegida(ev) {
     llamar('leerRemito', [dataUrl]).then(function (r) {
       var l = (r && r.lectura) || {};
       if (l.fecha) document.getElementById('remFecha').value = l.fecha;
+      if (l.numero) document.getElementById('remNumero').value = l.numero;
       if (l.proveedor) document.getElementById('remProveedor').value = l.proveedor;
       if (l.monto) document.getElementById('remMonto').value = l.monto;
       if (l.items) document.getElementById('remDescripcion').value = l.items;
@@ -1339,24 +1345,36 @@ function remFotoElegida(ev) {
   });
 }
 
-function guardarRemitoUI(btn) {
+function guardarRemitoUI(btn, forzar) {
   if (!estado.remFotoDataUrl) { mostrarToast('Sacá la foto primero'); return; }
 
   var fecha = document.getElementById('remFecha').value;
+  var numero = document.getElementById('remNumero').value.trim();
   var proveedor = document.getElementById('remProveedor').value;
   var monto = document.getElementById('remMonto').value;
   var desc = document.getElementById('remDescripcion').value;
 
   conCarga_(btn, 'Subiendo...', llamar('subirRemito', [{
-    foto: estado.remFotoDataUrl, fecha: fecha, proveedor: proveedor,
-    monto: monto, descripcion: desc, quien: ''
-  }])).then(function () {
+    foto: estado.remFotoDataUrl, fecha: fecha, numero: numero, proveedor: proveedor,
+    monto: monto, descripcion: desc, quien: '', forzar: !!forzar
+  }])).then(function (r) {
+    if (r && r.duplicado) {
+      var d = r.duplicado;
+      if (confirm('Ya hay un remito con el Nº ' + d.numero + ' (' + d.id + ', ' + fFecha_(d.fecha) +
+                  ', ' + (d.proveedor || 'sin proveedor') + ').\n\n¿Es otro distinto y lo subo igual?')) {
+        guardarRemitoUI(btn, true);
+      } else {
+        mostrarToast('No se subió: ya estaba cargado');
+      }
+      return;
+    }
     mostrarToast('Remito subido ✓');
     estado.remFotoDataUrl = '';
     document.getElementById('remPreview').style.display = 'none';
     document.getElementById('remPreviewPdf').classList.add('oculto');
     document.getElementById('remCampos').classList.add('oculto');
     document.getElementById('remFecha').value = '';
+    document.getElementById('remNumero').value = '';
     document.getElementById('remProveedor').value = '';
     document.getElementById('remMonto').value = '';
     document.getElementById('remDescripcion').value = '';
@@ -1373,7 +1391,8 @@ function cargarRemitos() {
       var div = document.createElement('div');
       div.className = 'item';
       div.innerHTML =
-        '<div class="fila1"><span>' + fFecha_(rem.fecha) + '</span><span>' + (rem.quien || '') + '</span></div>' +
+        '<div class="fila1"><span>' + fFecha_(rem.fecha) +
+          (rem.numero ? ' · Nº ' + escHtml_(rem.numero) : '') + '</span><span>' + (rem.quien || '') + '</span></div>' +
         '<div class="titulo">' + escHtml_(rem.proveedor || 'Sin proveedor') +
           (rem.monto ? ' — $' + rem.monto : '') + '</div>' +
         (rem.descripcion ? '<div class="desc">' + escHtml_(rem.descripcion) + '</div>' : '') +
@@ -1416,7 +1435,8 @@ function cargarPlanilla() {
         '<td class="fecha">' + fFecha_(rem.fecha) + '</td>' +
         '<td class="prov">' + escHtml_(rem.proveedor || '—') + '</td>' +
         '<td class="num">' + (rem.monto ? fPlata_(rem.monto) : '—') + '</td>' +
-        '<td class="det">' + escHtml_(rem.descripcion || '') + '</td>';
+        '<td class="det">' + (rem.numero ? '<b>Nº ' + escHtml_(rem.numero) + '</b> · ' : '') +
+          escHtml_(rem.descripcion || '') + '</td>';
       tr.onclick = function () { tr.classList.toggle('abierta'); };
       cuerpo.appendChild(tr);
     });
