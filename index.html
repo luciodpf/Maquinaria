@@ -985,7 +985,9 @@ var estado = {
 /* ====================== ARRANQUE ====================== */
 document.addEventListener('DOMContentLoaded', function () {
   ordenarInicio();
-  ir('home');
+  // ?ir=fumigacion abre directo esa sección (lo usa el link viejo de Aplicaciones)
+  var irA = (location.search.match(/[?&]ir=([^&]*)/) || [])[1];
+  ir(irA && VISTAS.indexOf(irA) >= 0 ? irA : 'home');
   cargarMaquinas();
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('sw.js').catch(function () {});
